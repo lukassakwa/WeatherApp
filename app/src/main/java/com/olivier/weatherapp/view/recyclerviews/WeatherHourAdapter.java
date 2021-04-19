@@ -1,8 +1,5 @@
 package com.olivier.weatherapp.view.recyclerviews;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.FutureWeather;
+import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +70,9 @@ public class WeatherHourAdapter extends RecyclerView.Adapter<WeatherHourAdapter.
 
         holder.weatherDescriptionItem.setText(weatherList.get(position).getDescription());
         holder.weatherTempItemTextView.setText((int) weatherList.get(position).getTemp() + "\u2103");
-        new RetriveRecyclerView(holder, position).execute();
+
+        String urlDisplay = "http://openweathermap.org/img/wn/" + weatherList.get(position).getIcon() + "@4x.png";
+        Picasso.get().load(urlDisplay).into(holder.weatherImage);
 
     }
 
@@ -83,41 +81,4 @@ public class WeatherHourAdapter extends RecyclerView.Adapter<WeatherHourAdapter.
         //Ilosc Itemow
         return weatherList.size();
     }
-
-    private class RetriveRecyclerView extends AsyncTask<Void, Void, Bitmap>{
-        private final ViewHolder viewHolder;
-        private final int position;
-
-        RetriveRecyclerView(ViewHolder viewHolder, int position){
-            this.viewHolder = viewHolder;
-            this.position = position;
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... voids) {
-            Bitmap mIcon = null;
-            try {
-                String urlDisplay = "http://openweathermap.org/img/wn/" + weatherList.get(position).getIcon() + "@4x.png";
-                InputStream in = new java.net.URL(urlDisplay).openStream();
-                mIcon = BitmapFactory.decodeStream(in);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return mIcon;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-
-            viewHolder.weatherImage.setImageBitmap(bitmap);
-        }
-    }
-
 }
