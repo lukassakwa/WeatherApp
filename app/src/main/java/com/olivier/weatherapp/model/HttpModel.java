@@ -9,8 +9,8 @@ public class HttpModel implements Serializable{
     private Double lat = 0.0;
     private String units = "metric";
     private String excludes = "minutely";
-    private String authorization = "1ef216a9ed374bfb72c959ef31347a1f";
-    private String query = "Warsaw";
+    private String authorization = "Yout api key";
+    private String query = "";
 
     public HttpModel() {
     }
