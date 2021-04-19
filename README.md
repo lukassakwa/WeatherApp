@@ -1,6 +1,8 @@
 # WeatherApp
 Android Weather App
 
+![androidWeatherApp](https://user-images.githubusercontent.com/75526352/115254903-18b4c600-a12e-11eb-9ce9-1c6a27eae1b3.png)
+
 Requirements
 
     Android 10 (API 29) or above
