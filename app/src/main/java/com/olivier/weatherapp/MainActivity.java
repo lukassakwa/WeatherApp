@@ -70,8 +70,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Toolbar setting
         Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView mToolbarTitle = findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
+        mToolbarTitle.setText(toolbar.getTitle());
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         bundle = new ArrayList<>();
         bundle.add(new Bundle());
@@ -149,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //TODO:: Title in center
+
+        //Left corner item
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icons8_city_buildings_30);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return true;
     }
 
@@ -161,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
             case R.id.action_settings:
+                Toast.makeText(this, "Work in progress", Toast.LENGTH_SHORT).show();
+                return true;
+            case android.R.id.home:
+                Toast.makeText(this, "Work in progress", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 break;
