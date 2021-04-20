@@ -37,7 +37,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -194,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         visibilityTextView.setText(firstWeatherElement.getVisibility() + "km");
         speedTextView.setText((int) firstWeatherElement.getSpeed() + "km/h");
         uvTextView.setText(firstWeatherElement.getUv() + "");
-        degreeTextView.setText(firstWeatherElement.getDegree() + "East");
+        degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
 
     }
 
@@ -229,6 +228,36 @@ public class MainActivity extends AppCompatActivity {
         return "";
     }
 
+    //Getting Wind direction
+    private String windDirection(int deg){
+        if(deg >= 350 || deg <= 10)
+            return "N";
+        if(deg > 10 && deg < 80)
+            return "NE";
+        if(deg >= 80 && deg <= 110)
+            return "E";
+        if(deg > 110 && deg < 170)
+            return "SE";
+        if(deg >= 170 && deg <= 190)
+            return "S";
+        if(deg > 190 && deg < 260)
+            return "SW";
+        if(deg >= 260 && deg <= 280)
+            return "W";
+        return "NW";
+    }
+
+    //Getting UV alert
+    private String uvAlert(double uv){
+        if(uv <= 2.0)
+            return "no risk";
+        if(uv <= 5.0)
+            return "Medium risk";
+        if(uv <= 7.0)
+            return "High risk";
+        return "Very high risk";
+    }
+
     public void SetActivity(HttpModel httpModel){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(httpModel.getHttpUrl())
@@ -260,13 +289,16 @@ public class MainActivity extends AppCompatActivity {
                     //Reading from Json Pojo
                     currentWeather.setTemp(weatherModel.getCurrent().getTemp());
                     currentWeather.setDescription(weatherModel.getCurrent().getWeather().get(0).getDescription());
+                    //getLocation
                     currentWeather.setName(getLocationName(httpModel));
                     currentWeather.setFeels_temp(weatherModel.getCurrent().getFeelsLike());
                     currentWeather.setVisibility(weatherModel.getCurrent().getVisibility());
                     currentWeather.setPressure(weatherModel.getCurrent().getPressure());
                     currentWeather.setSpeed(weatherModel.getCurrent().getWindSpeed());
-                    currentWeather.setDegree(weatherModel.getCurrent().getWindDeg());
-                    currentWeather.setUv((int) weatherModel.getCurrent().getUvi());
+                    //windDirection
+                    currentWeather.setDegree(windDirection(weatherModel.getCurrent().getWindDeg()));
+                    //uvAlert
+                    currentWeather.setUv(uvAlert(weatherModel.getCurrent().getUvi()));
                     currentWeather.setHumidity(weatherModel.getCurrent().getHumidity());
 
                     //DailyInit

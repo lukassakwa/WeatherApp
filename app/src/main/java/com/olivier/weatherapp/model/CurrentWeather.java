@@ -10,9 +10,9 @@ public class CurrentWeather {
     private int pressure;
     private int humidity;
     private int visibility;
-    private int uv;
+    private String uv;
     private double speed;
-    private int degree;
+    private String degree;
 
     public double getTemp() {
         return temp;
@@ -86,11 +86,11 @@ public class CurrentWeather {
         this.visibility = visibility;
     }
 
-    public int getUv() {
+    public String getUv() {
         return uv;
     }
 
-    public void setUv(int uv) {
+    public void setUv(String uv) {
         this.uv = uv;
     }
 
@@ -102,11 +102,11 @@ public class CurrentWeather {
         this.speed = speed;
     }
 
-    public int getDegree() {
+    public String getDegree() {
         return degree;
     }
 
-    public void setDegree(int degree) {
+    public void setDegree(String degree) {
         this.degree = degree;
     }
 }

@@ -13,9 +13,4 @@ public interface WeatherRestRepository {
                                   @Query("units") String units,
                                   @Query("appid") String authorization);
 
-    //@GET("find")
-    //Call<LocalizationModel> getLocalization(@Query("q") String city,
-    //                                        @Query("cnt") String cnt,
-    //                                        @Query("units") String units,
-    //                                        @Query("appid") String authorization);
 }
