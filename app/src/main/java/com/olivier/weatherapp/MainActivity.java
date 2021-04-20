@@ -2,6 +2,7 @@ package com.olivier.weatherapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,7 +19,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,9 +26,11 @@ import com.olivier.weatherapp.Repository.WeatherRestRepository;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.FutureWeather;
 import com.olivier.weatherapp.model.HttpModel;
+import com.olivier.weatherapp.model.weathermodels.onecall.Current;
+import com.olivier.weatherapp.model.weathermodels.onecall.DailyItem;
+import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel;
-import com.olivier.weatherapp.view.fragments.DailyWeatherFragment;
-import com.olivier.weatherapp.view.fragments.HourWeatherFragment;
+import com.olivier.weatherapp.view.fragments.MainWeatherFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,25 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
     private final int LOCATION_PERMISSION_CODE = 1000;
 
-    //Widgets
-    private TextView mainTemperatureTextView;
-    private TextView weatherDescriptionTextView;
-    private TextView feels_tempTextView;
-    private TextView pressureTextView;
-    private TextView humidityTextView;
-    private TextView visibilityTextView;
-    private TextView speedTextView;
-    private TextView degreeTextView;
-    private TextView uvTextView;
-    private TextView cityNameTextView;
-
-    //Bundle
-    private ArrayList<Bundle> bundle;
-
     //Location
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private LocationRequest locationResult;
-    private LocationCallback locationCallback;
+
+    //Bundle
+    private Bundle bundle;
+    //HttpModel
+    private HttpModel weather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,33 +66,28 @@ public class MainActivity extends AppCompatActivity {
         TextView mToolbarTitle = findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         mToolbarTitle.setText(toolbar.getTitle());
-
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        bundle = new ArrayList<>();
-        bundle.add(new Bundle());
-        bundle.add(new Bundle());
+        bundle = new Bundle();
+        weather = new HttpModel();
 
-        //Init Main Activity Widgets
-        InitWidgets();
-
-        HttpModel weather = new HttpModel();
         //location
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //Device Location
+        locationResult = LocationRequest.create();
+        locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationResult.setInterval(20 * 1000);
 
         //TODO: Do naprawienia rozpisania itp.
         //Permission check
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_PERMISSION_CODE);
         }
 
-        //Device Location
-        locationResult = LocationRequest.create();
-        locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationResult.setInterval(20 * 1000);
         //Function which Set location and send to start activity
         getLocation(weather);
 
@@ -114,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+
     }
 
     //When user decide to give app permission or not
@@ -127,19 +114,7 @@ public class MainActivity extends AppCompatActivity {
             case LOCATION_PERMISSION_CODE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if(location != null){
-                                HttpModel httpModel = new HttpModel();
-                                httpModel.setLon(location.getLongitude());
-                                httpModel.setLat(location.getLatitude());
 
-                                //Set Activity Widgets
-                                SetActivity(httpModel);
-                            }
-                        }
-                    });
                 } else {
                     Toast.makeText(this, "Location is needed to get weather", Toast.LENGTH_SHORT).show();
                 }
@@ -183,34 +158,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void InitWidgets() {
-        mainTemperatureTextView = findViewById(R.id.mainTemperatureTextView);
-        weatherDescriptionTextView = findViewById(R.id.weatherDescriptionTextView);
-        feels_tempTextView = findViewById(R.id.feels_tempTextView);
-        pressureTextView = findViewById(R.id.pressureTextView);
-        humidityTextView = findViewById(R.id.humidityTextView);
-        visibilityTextView = findViewById(R.id.visibilityTextView);
-        speedTextView = findViewById(R.id.windSpeedTextView);
-        uvTextView = findViewById(R.id.uvTextView);
-        degreeTextView = findViewById(R.id.windDirectionTextView);
-        cityNameTextView = findViewById(R.id.cityTextView);
-    }
-
-    public void mainWindowSetWidget(CurrentWeather firstWeatherElement) {
-        //Initialize widget from main Window
-        mainTemperatureTextView.setText((int) firstWeatherElement.getTemp() + "");
-        weatherDescriptionTextView.setText(firstWeatherElement.getDescription());
-        cityNameTextView.setText(firstWeatherElement.getName());
-        feels_tempTextView.setText((int) firstWeatherElement.getFeels_temp() + "\u2103");
-        pressureTextView.setText(firstWeatherElement.getPressure() + "hPa");
-        humidityTextView.setText(firstWeatherElement.getHumidity() + "%");
-        visibilityTextView.setText(firstWeatherElement.getVisibility() + "km");
-        speedTextView.setText((int) firstWeatherElement.getSpeed() + "km/h");
-        uvTextView.setText(firstWeatherElement.getUv() + "");
-        degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
-
-    }
-
     @SuppressLint("MissingPermission")
     private void getLocation(HttpModel httpModel){
         //Device location
@@ -230,9 +177,118 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void SetActivity(HttpModel httpModel){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(httpModel.getHttpUrl())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+
+        WeatherRestRepository weatherRestRepository = retrofit.create(WeatherRestRepository.class);
+
+        Call<WeatherModel> oneCall = weatherRestRepository.getWeather(httpModel.getLat(),
+                httpModel.getLon(),
+                httpModel.getExcludes(),
+                httpModel.getUnits(),
+                httpModel.getAuthorization());
+
+        oneCall.enqueue(new Callback<WeatherModel>() {
+
+            @Override
+            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
+
+                if(response.isSuccessful()){
+
+                    WeatherModel weatherModel = response.body();
+
+                    CurrentWeather currentWeather = currentWeatherInit(weatherModel.getCurrent(), httpModel);
+                    ArrayList<FutureWeather> futureWeather = dailyWeatherInit(weatherModel.getDaily());
+                    ArrayList<FutureWeather> hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
+
+                    //put dailyWeathers and hourlyWeathers to bundle
+                    //Fragments are going to read some data from bundle
+                    bundle.putSerializable("currentWeather", (Serializable) currentWeather);
+                    bundle.putSerializable("dailyWeathers", (Serializable) futureWeather);
+                    bundle.putSerializable("hourlyWeathers", (Serializable) hourlyWeather);
+
+                    //Init Fragments
+                    MainWeatherFragment mainWeatherFragment = new MainWeatherFragment(MainActivity.this);
+                    mainWeatherFragment.setArguments(bundle);
+
+                    //Doing some staff with fragments
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.mainWeatherFragment, mainWeatherFragment);
+                    fragmentTransaction.commit();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+        });
+    }
+
+    //Initializing current model object
+    private CurrentWeather currentWeatherInit(Current current, HttpModel httpModel){
+        CurrentWeather currentWeather = new CurrentWeather();
+        //Reading from Json Pojo
+        currentWeather.setTemp(current.getTemp());
+        currentWeather.setDescription(current.getWeather().get(0).getDescription());
+        //getLocation
+        currentWeather.setName(getLocationName(httpModel));
+        currentWeather.setFeels_temp(current.getFeelsLike());
+        currentWeather.setVisibility(current.getVisibility());
+        currentWeather.setPressure(current.getPressure());
+        currentWeather.setSpeed(current.getWindSpeed());
+        //windDirection
+        currentWeather.setDegree(windDirection(current.getWindDeg()));
+        //uvAlert
+        currentWeather.setUv(uvAlert(current.getUvi()));
+        currentWeather.setHumidity(current.getHumidity());
+
+        return currentWeather;
+    }
+
+    //Initializing Future Weather model for day
+    private ArrayList<FutureWeather> dailyWeatherInit(List<DailyItem> dailyItem){
+        ArrayList<FutureWeather> futureWeathers = new ArrayList<>();
+
+        //DailyInit
+        for(int i = 0; i < dailyItem.size()-1; i++){
+            //Reading from Json Pojo
+            FutureWeather futureWeather = new FutureWeather();
+            futureWeather.setTemp(dailyItem.get(i).getTemp().getDay());
+            futureWeather.setDescription(dailyItem.get(i).getWeather().get(0).getDescription());
+            futureWeather.setIcon(dailyItem.get(i).getWeather().get(0).getIcon());
+            futureWeather.setDt(dailyItem.get(i).getDt());
+            futureWeathers.add(futureWeather);
+        }
+
+        return futureWeathers;
+    }
+
+    //Initializing Future Weather model for hour
+    private ArrayList<FutureWeather> hourlyWeatherInit(List<HourlyItem> hourlyItem){
+        ArrayList<FutureWeather> hourlyWeathers = new ArrayList<>();
+
+        //HourlyInit
+        for(int i = 1; i <= 24; i++){
+            //Reading from Json Pojo
+            FutureWeather hourlyWeather = new FutureWeather();
+            hourlyWeather.setTemp(hourlyItem.get(i).getTemp());
+            hourlyWeather.setDescription(hourlyItem.get(i).getWeather().get(0).getDescription());
+            hourlyWeather.setIcon(hourlyItem.get(i).getWeather().get(0).getIcon());
+            hourlyWeather.setDt(hourlyItem.get(i).getDt());
+            hourlyWeathers.add(hourlyWeather);
+        }
+
+        return hourlyWeathers;
+    }
+
     //Getting name of City and country from lat and lon
     private String getLocationName(HttpModel httpModel){
-        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(httpModel.getLat(), httpModel.getLon(), 1);
             return addresses.get(0).getCountryName() + "/" + addresses.get(0).getLocality();
@@ -271,100 +327,4 @@ public class MainActivity extends AppCompatActivity {
             return "High risk";
         return "Very high risk";
     }
-
-    public void SetActivity(HttpModel httpModel){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(httpModel.getHttpUrl())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-
-        WeatherRestRepository weatherRestRepository = retrofit.create(WeatherRestRepository.class);
-
-        Call<WeatherModel> oneCall = weatherRestRepository.getWeather(httpModel.getLat(),
-                                                                        httpModel.getLon(),
-                                                                        httpModel.getExcludes(),
-                                                                        httpModel.getUnits(),
-                                                                        httpModel.getAuthorization());
-
-        oneCall.enqueue(new Callback<WeatherModel>() {
-
-            @Override
-            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
-
-                WeatherModel weatherModel = response.body();
-
-                if(response.isSuccessful()){
-                    CurrentWeather currentWeather = new CurrentWeather();
-                    ArrayList<FutureWeather> dailyWeathers = new ArrayList<>();
-                    ArrayList<FutureWeather> hourlyWeathers = new ArrayList<>();
-
-                    //Reading from Json Pojo
-                    currentWeather.setTemp(weatherModel.getCurrent().getTemp());
-                    currentWeather.setDescription(weatherModel.getCurrent().getWeather().get(0).getDescription());
-                    //getLocation
-                    currentWeather.setName(getLocationName(httpModel));
-                    currentWeather.setFeels_temp(weatherModel.getCurrent().getFeelsLike());
-                    currentWeather.setVisibility(weatherModel.getCurrent().getVisibility());
-                    currentWeather.setPressure(weatherModel.getCurrent().getPressure());
-                    currentWeather.setSpeed(weatherModel.getCurrent().getWindSpeed());
-                    //windDirection
-                    currentWeather.setDegree(windDirection(weatherModel.getCurrent().getWindDeg()));
-                    //uvAlert
-                    currentWeather.setUv(uvAlert(weatherModel.getCurrent().getUvi()));
-                    currentWeather.setHumidity(weatherModel.getCurrent().getHumidity());
-
-                    //DailyInit
-                    for(int i = 0; i < weatherModel.getDaily().size()-1; i++){
-                        //Reading from Json Pojo
-                        FutureWeather dailyWeather = new FutureWeather();
-                        dailyWeather.setTemp(weatherModel.getDaily().get(i).getTemp().getDay());
-                        dailyWeather.setDescription(weatherModel.getDaily().get(i).getWeather().get(0).getDescription());
-                        dailyWeather.setIcon(weatherModel.getDaily().get(i).getWeather().get(0).getIcon());
-                        dailyWeather.setDt(weatherModel.getDaily().get(i).getDt());
-                        dailyWeathers.add(dailyWeather);
-                    }
-
-                    //HourlyInit
-                    for(int i = 1; i <= 24; i++){
-                        //Reading from Json Pojo
-                        FutureWeather hourlyWeather = new FutureWeather();
-                        hourlyWeather.setTemp(weatherModel.getHourly().get(i).getTemp());
-                        hourlyWeather.setDescription(weatherModel.getHourly().get(i).getWeather().get(0).getDescription());
-                        hourlyWeather.setIcon(weatherModel.getHourly().get(i).getWeather().get(0).getIcon());
-                        hourlyWeather.setDt(weatherModel.getHourly().get(i).getDt());
-                        hourlyWeathers.add(hourlyWeather);
-                    }
-
-                    mainWindowSetWidget(currentWeather);
-
-                    //put dailyWeathers and hourlyWeathers to bundle
-                    //Fragments are going to read some data from bundle
-                    bundle.get(0).putSerializable("dailyWeathers", (Serializable) dailyWeathers);
-                    bundle.get(1).putSerializable("hourlyWeathers", (Serializable) hourlyWeathers);
-
-                    //Init Fragments
-                    DailyWeatherFragment dailyWeatherFragment = new DailyWeatherFragment(MainActivity.this);
-                    dailyWeatherFragment.setArguments(bundle.get(0));
-
-                    HourWeatherFragment hourWeatherFragment = new HourWeatherFragment(MainActivity.this);
-                    hourWeatherFragment.setArguments(bundle.get(1));
-
-                    //Doing some staff with fragments
-                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.dailyFragmentInActivity, dailyWeatherFragment);
-                    fragmentTransaction.replace(R.id.hourDayFragmentInActivity, hourWeatherFragment);
-                    fragmentTransaction.commit();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<WeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
-    }
-
-
-
 }

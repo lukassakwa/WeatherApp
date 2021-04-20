@@ -1,6 +1,8 @@
 package com.olivier.weatherapp.model;
 
-public class CurrentWeather {
+import java.io.Serializable;
+
+public class CurrentWeather implements Serializable {
     private double temp;
     private String description;
     private String name;
