@@ -3,6 +3,8 @@ package com.olivier.weatherapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,8 +35,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -211,6 +217,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Getting name of City and country from lat and lon
+    private String getLocationName(HttpModel httpModel){
+        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(httpModel.getLat(), httpModel.getLon(), 1);
+            return addresses.get(0).getCountryName() + "/" + addresses.get(0).getLocality();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     public void SetActivity(HttpModel httpModel){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(httpModel.getHttpUrl())
@@ -242,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                     //Reading from Json Pojo
                     currentWeather.setTemp(weatherModel.getCurrent().getTemp());
                     currentWeather.setDescription(weatherModel.getCurrent().getWeather().get(0).getDescription());
-                    currentWeather.setName(weatherModel.getTimezone());
+                    currentWeather.setName(getLocationName(httpModel));
                     currentWeather.setFeels_temp(weatherModel.getCurrent().getFeelsLike());
                     currentWeather.setVisibility(weatherModel.getCurrent().getVisibility());
                     currentWeather.setPressure(weatherModel.getCurrent().getPressure());
@@ -301,5 +319,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 }
