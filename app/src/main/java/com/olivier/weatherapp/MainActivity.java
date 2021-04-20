@@ -232,17 +232,17 @@ public class MainActivity extends AppCompatActivity {
     private String windDirection(int deg){
         if(deg >= 350 || deg <= 10)
             return "N";
-        if(deg > 10 && deg < 80)
+        if(deg < 80)
             return "NE";
-        if(deg >= 80 && deg <= 110)
+        if(deg <= 110)
             return "E";
-        if(deg > 110 && deg < 170)
+        if(deg < 170)
             return "SE";
-        if(deg >= 170 && deg <= 190)
+        if(deg <= 190)
             return "S";
-        if(deg > 190 && deg < 260)
+        if(deg < 260)
             return "SW";
-        if(deg >= 260 && deg <= 280)
+        if(deg <= 280)
             return "W";
         return "NW";
     }
@@ -267,7 +267,6 @@ public class MainActivity extends AppCompatActivity {
 
         WeatherRestRepository weatherRestRepository = retrofit.create(WeatherRestRepository.class);
 
-        //TODO: city as lon and lat
         Call<WeatherModel> oneCall = weatherRestRepository.getWeather(httpModel.getLat(),
                                                                         httpModel.getLon(),
                                                                         httpModel.getExcludes(),
@@ -313,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     //HourlyInit
-                    for(int i = 0; i <= 24; i++){
+                    for(int i = 1; i <= 24; i++){
                         //Reading from Json Pojo
                         FutureWeather hourlyWeather = new FutureWeather();
                         hourlyWeather.setTemp(weatherModel.getHourly().get(i).getTemp());
