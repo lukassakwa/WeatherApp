@@ -1,7 +1,7 @@
 # WeatherApp
 Android Weather App
 
-![androidWeatherApp](https://user-images.githubusercontent.com/75526352/115254903-18b4c600-a12e-11eb-9ce9-1c6a27eae1b3.png)
+![androidWeatherApp](https://user-images.githubusercontent.com/75526352/115454665-547c8800-a221-11eb-9203-5bf92c825e13.png)
 
 Requirements
 
