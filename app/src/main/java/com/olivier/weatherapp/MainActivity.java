@@ -74,11 +74,6 @@ public class MainActivity extends AppCompatActivity {
         //location
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        //Device Location
-        locationResult = LocationRequest.create();
-        locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationResult.setInterval(20 * 1000);
-
         //TODO: Do naprawienia rozpisania itp.
         //Permission check
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -88,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                     LOCATION_PERMISSION_CODE);
         }
 
+        //Device Location
+        locationResult = LocationRequest.create();
+        locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationResult.setInterval(20 * 1000);
         //Function which Set location and send to start activity
         getLocation(weather);
 
@@ -114,7 +113,19 @@ public class MainActivity extends AppCompatActivity {
             case LOCATION_PERMISSION_CODE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if(location != null){
+                                HttpModel httpModel = new HttpModel();
+                                httpModel.setLon(location.getLongitude());
+                                httpModel.setLat(location.getLatitude());
 
+                                //Set Activity Widgets
+                                SetActivity(httpModel);
+                            }
+                        }
+                    });
                 } else {
                     Toast.makeText(this, "Location is needed to get weather", Toast.LENGTH_SHORT).show();
                 }
