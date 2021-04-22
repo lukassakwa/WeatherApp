@@ -4,185 +4,195 @@
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <LinearLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical">
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="350dp"
-                    android:id="@+id/constraintLayout">
+        <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:id="@+id/constraintLayout">
+
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/mainTemperatureTextView"
+                            android:textSize="74sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginStart="16dp"
+                    />
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/weatherDescriptionTextView"
+                            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginEnd="16dp" android:layout_marginBottom="24dp"
+                            app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView"
+                            app:layout_constraintHorizontal_bias="1.0" android:textSize="30sp"/>
+                    <TextView
+                            android:text="\u2103"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView" android:textSize="24sp"
+                            app:layout_constraintTop_toTopOf="@+id/mainTemperatureTextView"
+                            android:layout_marginTop="18dp"/>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/weatherHourRecyclerView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="36dp">
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                    <TextView
+                            android:text="7-day weather report"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/dayReporTextView"
+                            app:layout_constraintTop_toBottomOf="@+id/weatherHourRecyclerView"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toTopOf="@+id/weatherDayRaportRecyclerView"
+                            android:layout_marginStart="20dp" android:layout_marginTop="15dp"
+                            android:layout_marginBottom="10dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:overScrollMode="never"
+                            android:id="@+id/weatherDayRaportRecyclerView"
+                            app:layout_constraintTop_toBottomOf="@+id/dayReporTextView"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginTop="10dp"/>
+
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/cityTextView"
+                            android:textSize="18sp"
+                            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
+                            app:layout_constraintBottom_toTopOf="@+id/weatherHourRecyclerView"
+                            android:layout_marginBottom="10dp"/>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
                 <TextView
-                        android:text="0"
+                        android:id="@+id/weatherDetailsTextView"
+                        android:text="Weather details"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/mainTemperatureTextView"
-                        android:textSize="74sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="16dp" android:layout_marginBottom="16dp"/>
-                <TextView
-                        android:text="Weather"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/weatherDescriptionTextView"
-                        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="16dp" android:layout_marginBottom="24dp"
-                        app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView"
-                        app:layout_constraintHorizontal_bias="1.0" android:textSize="30sp"/>
-                <TextView
-                        android:text="\u2103"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView" android:textSize="24sp"
-                        app:layout_constraintTop_toTopOf="@+id/mainTemperatureTextView"
-                        android:layout_marginTop="18dp"/>
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/weatherHourRecyclerView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginTop="36dp">
-                </androidx.recyclerview.widget.RecyclerView>
-
-                <TextView
-                        android:text="7-day weather report"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/textView"
-                        app:layout_constraintTop_toBottomOf="@+id/weatherHourRecyclerView"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toTopOf="@+id/weatherDayRaportRecyclerView"
-                        android:layout_marginStart="20dp" android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:overScrollMode="never"
-                        android:id="@+id/weatherDayRaportRecyclerView"
-                        app:layout_constraintTop_toBottomOf="@+id/textView"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginTop="10dp"/>
-
-                <TextView
-                        android:text="Warsaw"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/cityTextView"
-                        android:textSize="18sp"
+                        app:layout_constraintTop_toBottomOf="@+id/weatherDayRaportRecyclerView"
                         app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
-                        app:layout_constraintBottom_toTopOf="@+id/weatherHourRecyclerView"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginTop="20dp" android:textStyle="bold"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="330dp">
+
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/feels_tempTextView"
+                            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginTop="20dp" android:layout_marginStart="30dp"/>
+                    <TextView
+                            android:text="Apparent temperature"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/textView12"
+                            app:layout_constraintTop_toBottomOf="@+id/feels_tempTextView"
+                            app:layout_constraintStart_toStartOf="@+id/feels_tempTextView"
+                    />
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/visibilityTextView"
+                            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="20dp" android:layout_marginEnd="80dp"/>
+                    <TextView
+                            android:text="Visibility"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/textView14"
+                            app:layout_constraintTop_toBottomOf="@+id/visibilityTextView"
+                            app:layout_constraintStart_toStartOf="@+id/visibilityTextView"/>
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/pressureTextView"
+                            app:layout_constraintTop_toBottomOf="@+id/textView12"
+                            android:layout_marginTop="30dp" app:layout_constraintStart_toStartOf="parent"
+                            android:layout_marginStart="30dp"/>
+                    <TextView
+                            android:text="Air pressure"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/textView16"
+                            app:layout_constraintTop_toBottomOf="@+id/pressureTextView"
+                            app:layout_constraintStart_toStartOf="@+id/pressureTextView"/>
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@+id/textView16"
+                            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="30dp"
+                            android:layout_marginTop="30dp" android:id="@+id/humidityTextView"/>
+                    <TextView
+                            android:text="humidity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/textView20"
+                            app:layout_constraintStart_toStartOf="@+id/humidityTextView"
+                            app:layout_constraintTop_toBottomOf="@+id/humidityTextView"/>
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/windSpeedTextView"
+                            app:layout_constraintStart_toStartOf="@+id/textView14"
+                            app:layout_constraintTop_toBottomOf="@+id/textView3" android:layout_marginTop="30dp"/>
+                    <TextView
+                            android:text="WNW"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/windDirectionTextView"
+                            app:layout_constraintTop_toBottomOf="@+id/windSpeedTextView"
+                            app:layout_constraintStart_toStartOf="@+id/windSpeedTextView"/>
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/uvTextView"
+                            app:layout_constraintStart_toStartOf="@+id/visibilityTextView"
+                            app:layout_constraintTop_toBottomOf="@+id/textView14" android:layout_marginTop="30dp"/>
+                    <TextView
+                            android:text="UV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/textView3"
+                            app:layout_constraintTop_toBottomOf="@+id/uvTextView"
+                            app:layout_constraintStart_toStartOf="@+id/uvTextView"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-            <TextView
-                    android:id="@+id/textView4"
-                    android:text="Weather details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@+id/weatherDayRaportRecyclerView"
-                    app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp" android:textStyle="bold"/>
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="330dp">
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-                <TextView
-                        android:text="1 stopien"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/feels_tempTextView"
-                        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginTop="20dp" android:layout_marginStart="30dp"/>
-                <TextView
-                        android:text="Apparent temperature"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView12"
-                        app:layout_constraintTop_toBottomOf="@+id/feels_tempTextView"
-                        app:layout_constraintStart_toStartOf="@+id/feels_tempTextView"
-                />
-                <TextView
-                        android:text="16 km"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/visibilityTextView"
-                        app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginTop="20dp" android:layout_marginEnd="80dp"/>
-                <TextView
-                        android:text="Visibility"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView14"
-                        app:layout_constraintTop_toBottomOf="@+id/visibilityTextView"
-                        app:layout_constraintStart_toStartOf="@+id/visibilityTextView"/>
-                <TextView
-                        android:text="1 021 hpa"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/pressureTextView"
-                        app:layout_constraintTop_toBottomOf="@+id/textView12"
-                        android:layout_marginTop="30dp" app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="30dp"/>
-                <TextView
-                        android:text="Air pressure"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView16"
-                        app:layout_constraintTop_toBottomOf="@+id/pressureTextView"
-                        app:layout_constraintStart_toStartOf="@+id/pressureTextView"/>
-                <TextView
-                        android:text="91%"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@+id/textView16"
-                        app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="30dp"
-                        android:layout_marginTop="30dp" android:id="@+id/humidityTextView"/>
-                <TextView
-                        android:text="humidity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView20"
-                        app:layout_constraintStart_toStartOf="@+id/humidityTextView"
-                        app:layout_constraintTop_toBottomOf="@+id/humidityTextView"/>
-                <TextView
-                        android:text="18 km/h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/windSpeedTextView"
-                        app:layout_constraintStart_toStartOf="@+id/textView14"
-                        app:layout_constraintTop_toBottomOf="@+id/textView3" android:layout_marginTop="30dp"/>
-                <TextView
-                        android:text="WNW"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/windDirectionTextView"
-                        app:layout_constraintTop_toBottomOf="@+id/windSpeedTextView"
-                        app:layout_constraintStart_toStartOf="@+id/windSpeedTextView"/>
-                <TextView
-                        android:text="TextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/uvTextView"
-                        app:layout_constraintStart_toStartOf="@+id/visibilityTextView"
-                        app:layout_constraintTop_toBottomOf="@+id/textView14" android:layout_marginTop="30dp"/>
-                <TextView
-                        android:text="UV"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView3"
-                        app:layout_constraintTop_toBottomOf="@+id/uvTextView"
-                        app:layout_constraintStart_toStartOf="@+id/uvTextView"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
