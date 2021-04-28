@@ -38,15 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class LocationWeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment {
     //Context
     private FragmentActivity contextWeather;
 
     //HttpModel
     private HttpModel weather;
-
-    private ArrayList<FutureWeather> dailyWeathers;
-    private ArrayList<FutureWeather> hourlyWeathers;
 
     //Recycler View hours
     private RecyclerView weatherHourRecyclerView;
@@ -70,7 +67,7 @@ public class LocationWeatherFragment extends Fragment {
     private TextView uvTextView;
     private TextView cityNameTextView;
 
-    public LocationWeatherFragment(Context context){
+    public WeatherFragment(Context context){
         this.contextWeather = (FragmentActivity) context;
     }
 

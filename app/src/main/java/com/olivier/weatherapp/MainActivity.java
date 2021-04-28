@@ -2,49 +2,42 @@ package com.olivier.weatherapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.olivier.weatherapp.model.HttpModel;
-import com.olivier.weatherapp.view.fragments.LocationWeatherFragment;
+import com.olivier.weatherapp.view.fragments.WeatherFragment;
 import com.olivier.weatherapp.view.viewpager.ViewPagerFragmentAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
     //Location cod
     private final int LOCATION_PERMISSION_CODE = 1000;
+    private static final int REQUEST_CODE = 255;
 
-    //Bundle
-    private ArrayList<Bundle> bundle;
     //HttpModel
-    private ArrayList<HttpModel> weather;
-
-    //Location
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-    private LocationRequest locationResult;
+    private HashMap<String, HttpModel> cityLocationArray = new HashMap<>();
 
     //ViewPager
-    ViewPager2 mViewPager2;
-    ViewPagerFragmentAdapter mAdapter;
+    private ViewPager2 mViewPager2;
+    private ViewPagerFragmentAdapter mAdapter;
     private ArrayList<Fragment> arrayList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +51,8 @@ public class MainActivity extends AppCompatActivity {
         mToolbarTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //Todo: view pager
+        //ViewPager
         mViewPager2 = findViewById(R.id.view_pager);
-
-        bundle = new ArrayList<>();
-        weather = new ArrayList<>();
-
-        //location
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         //TODO: Do naprawienia rozpisania itp.
         //Permission check
@@ -75,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_PERMISSION_CODE);
         }
-
-        //Function which Set location and send to start activity
-        getLocation();
     }
 
     //When user decide to give app permission or not
@@ -91,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
             case LOCATION_PERMISSION_CODE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    getLocation();
-
+                    //Todo: intent to window with city choice
+                    Intent intentCity = new Intent(this, CitiesActivity.class);
+                    startActivityForResult(intentCity, REQUEST_CODE);
                 } else {
                     Toast.makeText(this, "Location is needed to get weather", Toast.LENGTH_SHORT).show();
                 }
@@ -103,12 +87,21 @@ public class MainActivity extends AppCompatActivity {
         // permissions this app might request.
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            //setting cities
+            this.cityLocationArray = (HashMap<String, HttpModel>) data.getExtras().getSerializable("httpModels");
+            SetViewPager();
+        }
+    }
+
     //Menu 3 kropki w prawym gornym rogu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        //TODO:: Title in center
 
         //Left corner item
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icons8_city_buildings_30);
@@ -128,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Work in progress", Toast.LENGTH_SHORT).show();
                 return true;
             case android.R.id.home:
-                Toast.makeText(this, "Work in progress", Toast.LENGTH_SHORT).show();
+                //Todo: intent to window with city choice
+                Intent intentCity = new Intent(this, CitiesActivity.class);
+                startActivityForResult(intentCity, REQUEST_CODE);
                 return true;
             default:
                 break;
@@ -137,62 +132,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressLint("MissingPermission")
-    private void getLocation(){
-        //Device location
-        mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location == null) {
-                    //Device Location
-                    locationResult = LocationRequest.create();
-                    locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    locationResult.setInterval(20 * 1000);
-                }
-                HttpModel httpModel = new HttpModel();
-                httpModel.setLat(location.getLatitude());
-                httpModel.setLon(location.getLongitude());
-
-                String msg = "Lat: " + httpModel.getLat() + "Lon" + httpModel.getLon();
-                Log.d("LOCATION_PARAMETERS", msg);
-
-                SetViewPager(httpModel);
-            }
-        });
-    }
-
-    private void SetViewPager(HttpModel httpModel) {
-        //Init View pager
-        HttpModel httpModel1 = new HttpModel();
-        httpModel1.setLat(httpModel.getLat());
-        httpModel1.setLon(httpModel.getLon());
-        weather.add(httpModel1);
-        HttpModel httpModel2 = new HttpModel();
-        httpModel2.setLat(52.237049);
-        httpModel2.setLon(21.017532);
-        weather.add(httpModel2);
-        HttpModel httpModel3 = new HttpModel();
-        httpModel3.setLat(52.409538);
-        httpModel3.setLon(16.931992);
-        weather.add(httpModel3);
-
-
-        Bundle bundle1 = new Bundle();
-        bundle1.putSerializable("httpModel", (Serializable) weather.get(0));
-        bundle.add(bundle1);
-
-        Bundle bundle2 = new Bundle();
-        bundle2.putSerializable("httpModel", (Serializable) weather.get(1));
-        bundle.add(bundle2);
-
-        Bundle bundle3 = new Bundle();
-        bundle3.putSerializable("httpModel", (Serializable) weather.get(2));
-        bundle.add(bundle3);
+    private void SetViewPager() {
+        arrayList.clear();
 
         //Init Fragments
-        for(int i = 0; i < weather.size(); i++){
-            LocationWeatherFragment mainWeatherFragment = new LocationWeatherFragment(MainActivity.this);
-            mainWeatherFragment.setArguments(bundle.get(i));
+        for(String i : cityLocationArray.keySet()){
+            Bundle fragmentBundle = new Bundle();
+            fragmentBundle.putSerializable("httpModel", (Serializable) cityLocationArray.get(i));
+            WeatherFragment mainWeatherFragment = new WeatherFragment(MainActivity.this);
+            mainWeatherFragment.setArguments(fragmentBundle);
             arrayList.add(mainWeatherFragment);
         }
 
@@ -202,6 +150,5 @@ public class MainActivity extends AppCompatActivity {
         mViewPager2.setPageTransformer(new MarginPageTransformer(0));
         mViewPager2.setAdapter(mAdapter);
     }
-
 
 }
