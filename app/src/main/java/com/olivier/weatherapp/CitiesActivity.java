@@ -34,6 +34,7 @@ public class CitiesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cities_activity);
 
+        //Setting toolbar elements
         Toolbar toolbar = findViewById(R.id.cities_toolbar);
         setSupportActionBar(toolbar);
         TextView mToolbarTitle = findViewById(R.id.cities_toolbar_title);
@@ -52,28 +53,50 @@ public class CitiesActivity extends AppCompatActivity {
         //location
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //Todo:: optimize this fragment of code
+        if(cityLocationArray.containsKey("current"))
+            currentButton.setBackgroundColor(getColor(R.color.lightBlue));
+        else
+            currentButton.setBackground(getDrawable(R.drawable.city_button));
+
+        if(cityLocationArray.containsKey("Warsaw"))
+            warsawButton.setBackgroundColor(getColor(R.color.lightBlue));
+        else
+            warsawButton.setBackground(getDrawable(R.drawable.city_button));
+
+        if(cityLocationArray.containsKey("Krakow"))
+            krakowButton.setBackgroundColor(getColor(R.color.lightBlue));
+        else
+            krakowButton.setBackground(getDrawable(R.drawable.city_button));
+
         //TODO:: background buttons
         //TODO:: add or remove city when button press
         currentButton.setOnClickListener((v)-> {
             if(cityLocationArray.containsKey("current")){
+                currentButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("current");
             }else{
+                currentButton.setBackgroundColor(getColor(R.color.lightBlue));
                 getLocation();
             }
         });
 
         warsawButton.setOnClickListener((v) -> {
             if(cityLocationArray.containsKey("Warsaw")){
+                warsawButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("Warsaw");
             }else{
+                warsawButton.setBackgroundColor(getColor(R.color.lightBlue));
                 sendData(21.017532, 52.237049, "Warsaw");
             }
         });
 
         krakowButton.setOnClickListener((v) -> {
             if(cityLocationArray.containsKey("Krakow")){
+                krakowButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("Krakow");
             }else{
+                krakowButton.setBackgroundColor(getColor(R.color.lightBlue));
                 sendData(19.944544, 50.049683, "Krakow");
             }
         });
@@ -131,6 +154,7 @@ public class CitiesActivity extends AppCompatActivity {
         onExitActivity();
     }
 
+    //send Data to Main Activity
     private void sendData(Double lon, Double lat, String name){
         HttpModel httpModel = new HttpModel();
         httpModel.setLon(lon);
@@ -141,6 +165,7 @@ public class CitiesActivity extends AppCompatActivity {
         onExitActivity();
     }
 
+    //Exit from Intent
     private void onExitActivity(){
         bundle.putSerializable("httpModels", cityLocationArray);
         intent.putExtras(bundle);
