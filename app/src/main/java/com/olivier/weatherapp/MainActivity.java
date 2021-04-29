@@ -151,4 +151,15 @@ public class MainActivity extends AppCompatActivity {
         mViewPager2.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        cityLocationArray = (HashMap<String, HttpModel>) savedInstanceState.getSerializable("citiesHashMap");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putSerializable("citiesHashMap", cityLocationArray);
+    }
 }

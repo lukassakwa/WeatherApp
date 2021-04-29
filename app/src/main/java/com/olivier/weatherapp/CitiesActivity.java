@@ -45,18 +45,8 @@ public class CitiesActivity extends AppCompatActivity {
         mToolbarTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //Resolve back data to hashMap
-        cityLocationArray = new HashMap<>();
-        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
-        try{
-            //get from shared prefs
-            String storedHashMapString = pSharedPref.getString("cityHashMap", (new JSONObject()).toString());
-            java.lang.reflect.Type type = new TypeToken<HashMap<String, HttpModel>>(){}.getType();
-            Gson gson = new Gson();
-            cityLocationArray = gson.fromJson(storedHashMapString, type);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        //Resolve back data from sharedpreferences to hashMap
+        cityLocationArray = getPreferences();
 
         //initialize Buttons
         Button currentButton = findViewById(R.id.currentButton);
@@ -71,8 +61,7 @@ public class CitiesActivity extends AppCompatActivity {
         currentButton.setOnClickListener((v)-> {
             if(cityLocationArray.containsKey("current")){
                 cityLocationArray.remove("current");
-                savePreferences();
-                onExitActivity();
+                setPreferences();
             }else{
                 getLocation();
             }
@@ -81,8 +70,7 @@ public class CitiesActivity extends AppCompatActivity {
         warsawButton.setOnClickListener((v) -> {
             if(cityLocationArray.containsKey("Warsaw")){
                 cityLocationArray.remove("Warsaw");
-                savePreferences();
-                onExitActivity();
+                setPreferences();
             }else{
                 sendData(21.017532, 52.237049, "Warsaw");
             }
@@ -91,8 +79,7 @@ public class CitiesActivity extends AppCompatActivity {
         krakowButton.setOnClickListener((v) -> {
             if(cityLocationArray.containsKey("Krakow")){
                 cityLocationArray.remove("Krakow");
-                savePreferences();
-                onExitActivity();
+                setPreferences();
             }else{
                 sendData(19.944544, 50.049683, "Krakow");
             }
@@ -118,7 +105,7 @@ public class CitiesActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onExitActivity();
                 return true;
             default:
                 break;
@@ -151,18 +138,33 @@ public class CitiesActivity extends AppCompatActivity {
         httpModel.setLat(lat);
 
         cityLocationArray.put(name, httpModel);
-        savePreferences();
+        setPreferences();
 
         onExitActivity();
     }
 
     //Saving HashMap
-    private void savePreferences(){
+    private void setPreferences(){
         SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
         Gson gson = new Gson();
         String hashMapString = gson.toJson(cityLocationArray);
         //save in shared prefs
         pSharedPref.edit().putString("cityHashMap", hashMapString).apply();
+    }
+
+    private HashMap<String, HttpModel> getPreferences(){
+        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
+        try{
+            //get from shared prefs
+            String storedHashMapString = pSharedPref.getString("cityHashMap", (new JSONObject()).toString());
+            java.lang.reflect.Type type = new TypeToken<HashMap<String, HttpModel>>(){}.getType();
+            Gson gson = new Gson();
+            return gson.fromJson(storedHashMapString, type);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return new HashMap<>();
     }
 
     private void onExitActivity(){

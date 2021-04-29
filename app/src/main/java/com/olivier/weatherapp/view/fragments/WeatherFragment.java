@@ -193,10 +193,10 @@ public class WeatherFragment extends Fragment {
         WeatherRestRepository weatherRestRepository = ClientApi.getClient(httpModel).create(WeatherRestRepository.class);
 
         Call<WeatherModel> oneCall = weatherRestRepository.getWeather(httpModel.getLat(),
-                httpModel.getLon(),
-                httpModel.getExcludes(),
-                httpModel.getUnits(),
-                httpModel.getAuthorization());
+                                                                    httpModel.getLon(),
+                                                                    httpModel.getExcludes(),
+                                                                    httpModel.getUnits(),
+                                                                    httpModel.getAuthorization());
 
         oneCall.enqueue(new Callback<WeatherModel>() {
 
