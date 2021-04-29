@@ -55,17 +55,17 @@ public class CitiesActivity extends AppCompatActivity {
 
         //Todo:: optimize this fragment of code
         if(cityLocationArray.containsKey("current"))
-            currentButton.setBackgroundColor(getColor(R.color.lightBlue));
+            currentButton.setBackground(getDrawable(R.drawable.city_button_light));
         else
             currentButton.setBackground(getDrawable(R.drawable.city_button));
 
         if(cityLocationArray.containsKey("Warsaw"))
-            warsawButton.setBackgroundColor(getColor(R.color.lightBlue));
+            warsawButton.setBackground(getDrawable(R.drawable.city_button_light));
         else
             warsawButton.setBackground(getDrawable(R.drawable.city_button));
 
         if(cityLocationArray.containsKey("Krakow"))
-            krakowButton.setBackgroundColor(getColor(R.color.lightBlue));
+            krakowButton.setBackground(getDrawable(R.drawable.city_button_light));
         else
             krakowButton.setBackground(getDrawable(R.drawable.city_button));
 
@@ -76,7 +76,7 @@ public class CitiesActivity extends AppCompatActivity {
                 currentButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("current");
             }else{
-                currentButton.setBackgroundColor(getColor(R.color.lightBlue));
+                currentButton.setBackground(getDrawable(R.drawable.city_button_light));
                 getLocation();
             }
         });
@@ -86,7 +86,7 @@ public class CitiesActivity extends AppCompatActivity {
                 warsawButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("Warsaw");
             }else{
-                warsawButton.setBackgroundColor(getColor(R.color.lightBlue));
+                warsawButton.setBackground(getDrawable(R.drawable.city_button_light));
                 sendData(21.017532, 52.237049, "Warsaw");
             }
         });
@@ -96,7 +96,7 @@ public class CitiesActivity extends AppCompatActivity {
                 krakowButton.setBackground(getDrawable(R.drawable.city_button));
                 cityLocationArray.remove("Krakow");
             }else{
-                krakowButton.setBackgroundColor(getColor(R.color.lightBlue));
+                krakowButton.setBackground(getDrawable(R.drawable.city_button_light));
                 sendData(19.944544, 50.049683, "Krakow");
             }
         });
