@@ -1,3 +1,4 @@
+
 # WeatherApp
 Android Weather App
 
@@ -15,3 +16,4 @@ Built With
     OpenWeatherMap - Weather API
     Gson - A Java serialization/deserialization library 
     Picasso - A powerful image downloading and caching library for Android
+
