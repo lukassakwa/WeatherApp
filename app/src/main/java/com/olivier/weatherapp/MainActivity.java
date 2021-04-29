@@ -3,6 +3,7 @@ package com.olivier.weatherapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,9 +17,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.olivier.weatherapp.model.HttpModel;
 import com.olivier.weatherapp.view.fragments.WeatherFragment;
 import com.olivier.weatherapp.view.viewpager.ViewPagerFragmentAdapter;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,8 +31,12 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     //Location cod
+    private static final String PREFS_NAME = "PrefMain";
     private final int LOCATION_PERMISSION_CODE = 1000;
     private static final int REQUEST_CODE = 255;
+
+    //Bundle
+    Bundle intentBundle = new Bundle();
 
     //HttpModel
     private HashMap<String, HttpModel> cityLocationArray = new HashMap<>();
@@ -62,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_PERMISSION_CODE);
         }
+
+        cityLocationArray = getPreferences();
+        SetViewPager();
     }
 
     //When user decide to give app permission or not
@@ -77,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //Todo: intent to window with city choice
                     Intent intentCity = new Intent(this, CitiesActivity.class);
+                    intentBundle.putSerializable("httpModels", cityLocationArray);
+                    intentCity.putExtras(intentBundle);
                     startActivityForResult(intentCity, REQUEST_CODE);
                 } else {
                     Toast.makeText(this, "Location is needed to get weather", Toast.LENGTH_SHORT).show();
@@ -123,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 //Todo: intent to window with city choice
                 Intent intentCity = new Intent(this, CitiesActivity.class);
+                intentBundle.putSerializable("httpModels", cityLocationArray);
+                intentCity.putExtras(intentBundle);
                 startActivityForResult(intentCity, REQUEST_CODE);
                 return true;
             default:
@@ -152,14 +167,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        cityLocationArray = (HashMap<String, HttpModel>) savedInstanceState.getSerializable("citiesHashMap");
+    protected void onStop() {
+        super.onStop();
+
+        setPreferences();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable("citiesHashMap", cityLocationArray);
+    //Saving HashMap
+    private void setPreferences(){
+        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String hashMapString = gson.toJson(cityLocationArray);
+        //save in shared prefs
+        pSharedPref.edit().putString("cityHashMap", hashMapString).apply();
+    }
+
+    private HashMap<String, HttpModel> getPreferences(){
+        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
+        try{
+            //get from shared prefs
+            String storedHashMapString = pSharedPref.getString("cityHashMap", (new JSONObject()).toString());
+            java.lang.reflect.Type type = new TypeToken<HashMap<String, HttpModel>>(){}.getType();
+            Gson gson = new Gson();
+            return gson.fromJson(storedHashMapString, type);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return new HashMap<>();
     }
 }
