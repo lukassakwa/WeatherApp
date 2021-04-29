@@ -26,8 +26,8 @@ public class CitiesActivity extends AppCompatActivity {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private LocationRequest locationResult;
 
-    private Intent intent = new Intent();
-    private Bundle bundle = new Bundle();
+    private final Intent intent = new Intent();
+    private final Bundle bundle = new Bundle();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,6 +123,12 @@ public class CitiesActivity extends AppCompatActivity {
                 sendData(location.getLongitude(), location.getLatitude(), "current");
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        onExitActivity();
     }
 
     private void sendData(Double lon, Double lat, String name){
