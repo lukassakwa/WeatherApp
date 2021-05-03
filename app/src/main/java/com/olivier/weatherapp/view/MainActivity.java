@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     LOCATION_PERMISSION_CODE);
         }
 
+        //get saved hash map from peferences
         cityLocationArray = getPreferences();
         SetViewPager();
     }

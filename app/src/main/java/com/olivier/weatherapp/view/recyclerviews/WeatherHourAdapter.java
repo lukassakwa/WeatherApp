@@ -81,4 +81,5 @@ public class WeatherHourAdapter extends RecyclerView.Adapter<WeatherHourAdapter.
         //Ilosc Itemow
         return weatherList.size();
     }
+
 }

@@ -5,13 +5,14 @@ import java.io.Serializable;
 public class CurrentWeather implements Serializable {
     private double temp;
     private String description;
+    private String name;
     private double feels_temp;
     private int pressure;
     private int humidity;
     private int visibility;
-    private double uv;
+    private String uv;
     private double speed;
-    private int degree;
+    private String degree;
 
     public double getTemp() {
         return temp;
@@ -27,6 +28,14 @@ public class CurrentWeather implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getFeels_temp() {
@@ -61,19 +70,19 @@ public class CurrentWeather implements Serializable {
         this.visibility = visibility;
     }
 
-    public double getUv() {
+    public String getUv() {
         return uv;
     }
 
-    public void setUv(double uv) {
+    public void setUv(String uv) {
         this.uv = uv;
     }
 
-    public int getDegree() {
+    public String getDegree() {
         return degree;
     }
 
-    public void setDegree(int degree) {
+    public void setDegree(String degree) {
         this.degree = degree;
     }
 

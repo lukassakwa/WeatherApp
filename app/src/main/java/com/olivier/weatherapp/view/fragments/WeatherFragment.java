@@ -1,8 +1,6 @@
 package com.olivier.weatherapp.view.fragments;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,18 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.presenter.ContractMVP;
-import com.olivier.weatherapp.presenter.WeatherController;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.FutureWeather;
 import com.olivier.weatherapp.model.WeatherHttpModel;
+import com.olivier.weatherapp.presenter.ContractMVP;
+import com.olivier.weatherapp.presenter.WeatherController;
 import com.olivier.weatherapp.view.recyclerviews.WeatherDayRaportAdapter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherHourAdapter;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class WeatherFragment extends Fragment implements ContractMVP.WeatherView {
     //Presenter
@@ -128,7 +123,7 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         });
 
         //InitRecyclerView
-        weatherController.getWeather(weather);
+        weatherController.getWeather();
 
         //Refresh Swipe
         //Allow user to refresh weather data
@@ -136,7 +131,7 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                weatherController.getWeather(weather);
+                weatherController.getWeather();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -161,17 +156,17 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         //Initialize widget from main Window
         mainTemperatureTextView.setText((int) firstWeatherElement.getTemp() + "");
         weatherDescriptionTextView.setText(firstWeatherElement.getDescription());
-        //getLocationName
-        cityNameTextView.setText(getLocationName(weather));
+        //getLocation
+        weatherController.getLocationName(contextWeather);
         feels_tempTextView.setText((int) firstWeatherElement.getFeels_temp() + "\u2103");
         pressureTextView.setText(firstWeatherElement.getPressure() + "hPa");
         humidityTextView.setText(firstWeatherElement.getHumidity() + "%");
         visibilityTextView.setText(firstWeatherElement.getVisibility() + "km");
         speedTextView.setText((int) firstWeatherElement.getSpeed() + "km/h");
         //uv ALert
-        uvTextView.setText(uvAlert(firstWeatherElement.getUv()) + "");
+        uvTextView.setText(firstWeatherElement.getUv() + "");
         //windDirection
-        degreeTextView.setText(windDirection(firstWeatherElement.getDegree()) + " wind");
+        degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
     }
 
     private void DayRecyclerView(ArrayList<FutureWeather> dailyDataModels){
@@ -201,45 +196,9 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         mainWindowSetWidget(currentWeather);
     }
 
-    //Getting name of City and country from lat and lon
-    private String getLocationName(WeatherHttpModel httpModel){
-        Geocoder geocoder = new Geocoder(contextWeather, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(httpModel.getLat(), httpModel.getLon(), 1);
-            return addresses.get(0).getCountryName() + "/" + addresses.get(0).getLocality();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    //Getting Wind direction
-    private String windDirection(int deg){
-        if(deg >= 350 || deg <= 10)
-            return "N";
-        if(deg < 80)
-            return "NE";
-        if(deg <= 110)
-            return "E";
-        if(deg < 170)
-            return "SE";
-        if(deg <= 190)
-            return "S";
-        if(deg < 260)
-            return "SW";
-        if(deg <= 280)
-            return "W";
-        return "NW";
-    }
-
-    //Getting UV alert
-    private String uvAlert(double uv){
-        if(uv <= 2.0)
-            return "no risk";
-        if(uv <= 5.0)
-            return "Medium risk";
-        if(uv <= 7.0)
-            return "High risk";
-        return "Very high risk";
+    @Override
+    public void showName(String cityName) {
+        //setLocationName
+        cityNameTextView.setText(cityName);
     }
 }

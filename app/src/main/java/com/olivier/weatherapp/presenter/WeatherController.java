@@ -1,6 +1,9 @@
 package com.olivier.weatherapp.presenter;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.util.Log;
+import androidx.fragment.app.FragmentActivity;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.FutureWeather;
 import com.olivier.weatherapp.model.WeatherHttpModel;
@@ -14,25 +17,45 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class WeatherController extends BasePresenter<ContractMVP.WeatherView> implements ContractMVP.WeatherPresenter{
 
     private WeatherHttpModel weatherHttpModel;
 
+    private CurrentWeather currentWeather;
+    private ArrayList<FutureWeather> hourlyWeather;
+    private ArrayList<FutureWeather> dailyWeather;
+
     public WeatherController(WeatherHttpModel weatherHttpModel) {
         this.weatherHttpModel = weatherHttpModel;
     }
 
+    //Getting name of City and country from lat and lon
     @Override
-    public void getWeather(WeatherHttpModel weatherHttpModel) {
+    public void getLocationName(FragmentActivity fragmentActivity){
+        Geocoder geocoder = new Geocoder(fragmentActivity, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(weatherHttpModel.getLat(), weatherHttpModel.getLon(), 1);
+
+            view.showName(addresses.get(0).getCountryName() + "/" + addresses.get(0).getLocality());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void getWeather() {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(weatherHttpModel.getHttpUrl())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        WeatherRestRepository weatherRestRepository = retrofit.create(WeatherRestRepository.class);
+
+        ContractMVP.WeatherRestRepository weatherRestRepository = retrofit.create(ContractMVP.WeatherRestRepository.class);
 
         Call<WeatherModel> oneCall = weatherRestRepository.getWeather(weatherHttpModel.getLat(),
                 weatherHttpModel.getLon(),
@@ -42,10 +65,6 @@ public class WeatherController extends BasePresenter<ContractMVP.WeatherView> im
 
         oneCall.enqueue(new Callback<WeatherModel>() {
 
-            private ArrayList<FutureWeather> hourlyWeather;
-            private ArrayList<FutureWeather> dailyWeather;
-            private CurrentWeather currentWeather;
-
             @Override
             public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
 
@@ -53,10 +72,9 @@ public class WeatherController extends BasePresenter<ContractMVP.WeatherView> im
 
                     WeatherModel weatherModel = response.body();
 
-                    //TODO:: current weather Init to repair
-                    this.currentWeather = currentWeatherInit(weatherModel.getCurrent());
-                    this.dailyWeather = dailyWeatherInit(weatherModel.getDaily());
-                    this.hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
+                    currentWeather = currentWeatherInit(weatherModel.getCurrent());
+                    dailyWeather = dailyWeatherInit(weatherModel.getDaily());
+                    hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
 
                     view.showWeather(currentWeather, hourlyWeather, dailyWeather);
                 }
@@ -81,9 +99,9 @@ public class WeatherController extends BasePresenter<ContractMVP.WeatherView> im
         currentWeather.setPressure(current.getPressure());
         currentWeather.setSpeed(current.getWindSpeed());
         //windDirection
-        currentWeather.setDegree(current.getWindDeg());
+        currentWeather.setDegree(windDirection(current.getWindDeg()));
         //uvAlert
-        currentWeather.setUv(current.getUvi());
+        currentWeather.setUv(uvAlert(current.getUvi()));
         currentWeather.setHumidity(current.getHumidity());
 
         return currentWeather;
@@ -123,5 +141,35 @@ public class WeatherController extends BasePresenter<ContractMVP.WeatherView> im
         }
 
         return hourlyWeathers;
+    }
+
+    //Getting Wind direction
+    private String windDirection(int deg){
+        if(deg >= 350 || deg <= 10)
+            return "N";
+        if(deg < 80)
+            return "NE";
+        if(deg <= 110)
+            return "E";
+        if(deg < 170)
+            return "SE";
+        if(deg <= 190)
+            return "S";
+        if(deg < 260)
+            return "SW";
+        if(deg <= 280)
+            return "W";
+        return "NW";
+    }
+
+    //Getting UV alert
+    private String uvAlert(double uv){
+        if(uv <= 2.0)
+            return "no risk";
+        if(uv <= 5.0)
+            return "Medium risk";
+        if(uv <= 7.0)
+            return "High risk";
+        return "Very high risk";
     }
 }
