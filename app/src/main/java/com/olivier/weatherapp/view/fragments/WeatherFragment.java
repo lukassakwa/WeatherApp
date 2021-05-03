@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,32 +17,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.Repository.WeatherRestRepository;
-import com.olivier.weatherapp.controller.ClientApi;
+import com.olivier.weatherapp.presenter.ContractMVP;
+import com.olivier.weatherapp.presenter.WeatherController;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.FutureWeather;
-import com.olivier.weatherapp.model.HttpModel;
-import com.olivier.weatherapp.model.weathermodels.onecall.Current;
-import com.olivier.weatherapp.model.weathermodels.onecall.DailyItem;
-import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
-import com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel;
+import com.olivier.weatherapp.model.WeatherHttpModel;
 import com.olivier.weatherapp.view.recyclerviews.WeatherDayRaportAdapter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherHourAdapter;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class WeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment implements ContractMVP.WeatherView {
+    //Presenter
+    private WeatherController weatherController;
+
     //Context
-    private FragmentActivity contextWeather;
+    private final FragmentActivity contextWeather;
 
     //HttpModel
-    private HttpModel weather;
+    private WeatherHttpModel weather;
 
     //Recycler View hours
     private RecyclerView weatherHourRecyclerView;
@@ -75,10 +70,15 @@ public class WeatherFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        weather = (HttpModel) getArguments().getSerializable("httpModel");
-
         weatherHourRecyclerViewLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.HORIZONTAL, false);
         weatherDayRaportLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.VERTICAL, false);
+
+        //Weather model data from bundle;
+        weather = (WeatherHttpModel) getArguments().getSerializable("httpModel");
+
+        //presenter
+        weatherController = new WeatherController(weather);
+        weatherController.attach(this);
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -128,7 +128,7 @@ public class WeatherFragment extends Fragment {
         });
 
         //InitRecyclerView
-        SetActivity(weather);
+        weatherController.getWeather(weather);
 
         //Refresh Swipe
         //Allow user to refresh weather data
@@ -136,7 +136,7 @@ public class WeatherFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                SetActivity(weather);
+                weatherController.getWeather(weather);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -161,14 +161,17 @@ public class WeatherFragment extends Fragment {
         //Initialize widget from main Window
         mainTemperatureTextView.setText((int) firstWeatherElement.getTemp() + "");
         weatherDescriptionTextView.setText(firstWeatherElement.getDescription());
-        cityNameTextView.setText(firstWeatherElement.getName());
+        //getLocationName
+        cityNameTextView.setText(getLocationName(weather));
         feels_tempTextView.setText((int) firstWeatherElement.getFeels_temp() + "\u2103");
         pressureTextView.setText(firstWeatherElement.getPressure() + "hPa");
         humidityTextView.setText(firstWeatherElement.getHumidity() + "%");
         visibilityTextView.setText(firstWeatherElement.getVisibility() + "km");
         speedTextView.setText((int) firstWeatherElement.getSpeed() + "km/h");
-        uvTextView.setText(firstWeatherElement.getUv() + "");
-        degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
+        //uv ALert
+        uvTextView.setText(uvAlert(firstWeatherElement.getUv()) + "");
+        //windDirection
+        degreeTextView.setText(windDirection(firstWeatherElement.getDegree()) + " wind");
     }
 
     private void DayRecyclerView(ArrayList<FutureWeather> dailyDataModels){
@@ -188,103 +191,18 @@ public class WeatherFragment extends Fragment {
         weatherHourRecyclerView.setAdapter(weatherHourRecyclerViewAdapter);
     }
 
-    public void SetActivity(HttpModel httpModel){
-
-        WeatherRestRepository weatherRestRepository = ClientApi.getClient(httpModel).create(WeatherRestRepository.class);
-
-        Call<WeatherModel> oneCall = weatherRestRepository.getWeather(httpModel.getLat(),
-                                                                    httpModel.getLon(),
-                                                                    httpModel.getExcludes(),
-                                                                    httpModel.getUnits(),
-                                                                    httpModel.getAuthorization());
-
-        oneCall.enqueue(new Callback<WeatherModel>() {
-
-            @Override
-            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
-
-                if(response.isSuccessful()){
-
-                    WeatherModel weatherModel = response.body();
-
-                    CurrentWeather currentWeather = currentWeatherInit(weatherModel.getCurrent(), httpModel);
-                    ArrayList<FutureWeather> futureWeather = dailyWeatherInit(weatherModel.getDaily());
-                    ArrayList<FutureWeather> hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
-
-                    //Initializing data on daily recyclerView
-                    DayRecyclerView(futureWeather);
-                    HourRecyclerView(hourlyWeather);
-                    //Initializing widgets
-                    mainWindowSetWidget(currentWeather);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<WeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
-    }
-
-    //Initializing current model object
-    private CurrentWeather currentWeatherInit(Current current, HttpModel httpModel){
-        CurrentWeather currentWeather = new CurrentWeather();
-        //Reading from Json Pojo
-        currentWeather.setTemp(current.getTemp());
-        currentWeather.setDescription(current.getWeather().get(0).getDescription());
-        //getLocation
-        currentWeather.setName(getLocationName(httpModel));
-        currentWeather.setFeels_temp(current.getFeelsLike());
-        currentWeather.setVisibility(current.getVisibility());
-        currentWeather.setPressure(current.getPressure());
-        currentWeather.setSpeed(current.getWindSpeed());
-        //windDirection
-        currentWeather.setDegree(windDirection(current.getWindDeg()));
-        //uvAlert
-        currentWeather.setUv(uvAlert(current.getUvi()));
-        currentWeather.setHumidity(current.getHumidity());
-
-        return currentWeather;
-    }
-
-    //Initializing Future Weather model for day
-    private ArrayList<FutureWeather> dailyWeatherInit(List<DailyItem> dailyItem){
-        ArrayList<FutureWeather> futureWeathers = new ArrayList<>();
-
-        //DailyInit
-        for(int i = 0; i < dailyItem.size()-1; i++){
-            //Reading from Json Pojo
-            FutureWeather futureWeather = new FutureWeather();
-            futureWeather.setTemp(dailyItem.get(i).getTemp().getDay());
-            futureWeather.setDescription(dailyItem.get(i).getWeather().get(0).getDescription());
-            futureWeather.setIcon(dailyItem.get(i).getWeather().get(0).getIcon());
-            futureWeather.setDt(dailyItem.get(i).getDt());
-            futureWeathers.add(futureWeather);
-        }
-
-        return futureWeathers;
-    }
-
-    //Initializing Future Weather model for hour
-    private ArrayList<FutureWeather> hourlyWeatherInit(List<HourlyItem> hourlyItem){
-        ArrayList<FutureWeather> hourlyWeathers = new ArrayList<>();
-
-        //HourlyInit
-        for(int i = 1; i <= 24; i++){
-            //Reading from Json Pojo
-            FutureWeather hourlyWeather = new FutureWeather();
-            hourlyWeather.setTemp(hourlyItem.get(i).getTemp());
-            hourlyWeather.setDescription(hourlyItem.get(i).getWeather().get(0).getDescription());
-            hourlyWeather.setIcon(hourlyItem.get(i).getWeather().get(0).getIcon());
-            hourlyWeather.setDt(hourlyItem.get(i).getDt());
-            hourlyWeathers.add(hourlyWeather);
-        }
-
-        return hourlyWeathers;
+    //from ContractMVP.View interface
+    @Override
+    public void showWeather(CurrentWeather currentWeather, ArrayList<FutureWeather> hourlyWeather, ArrayList<FutureWeather> dailyWeather) {
+        //Initializing data on daily recyclerView
+        DayRecyclerView(dailyWeather);
+        HourRecyclerView(hourlyWeather);
+        //Initializing widgets
+        mainWindowSetWidget(currentWeather);
     }
 
     //Getting name of City and country from lat and lon
-    private String getLocationName(HttpModel httpModel){
+    private String getLocationName(WeatherHttpModel httpModel){
         Geocoder geocoder = new Geocoder(contextWeather, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(httpModel.getLat(), httpModel.getLon(), 1);

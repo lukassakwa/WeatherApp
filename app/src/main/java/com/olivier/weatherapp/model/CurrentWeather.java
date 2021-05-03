@@ -5,16 +5,13 @@ import java.io.Serializable;
 public class CurrentWeather implements Serializable {
     private double temp;
     private String description;
-    private String name;
     private double feels_temp;
-    private double temp_max;
-    private double temp_min;
     private int pressure;
     private int humidity;
     private int visibility;
-    private String uv;
+    private double uv;
     private double speed;
-    private String degree;
+    private int degree;
 
     public double getTemp() {
         return temp;
@@ -32,36 +29,12 @@ public class CurrentWeather implements Serializable {
         this.description = description;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public double getFeels_temp() {
         return feels_temp;
     }
 
     public void setFeels_temp(double feels_temp) {
         this.feels_temp = feels_temp;
-    }
-
-    public double getTemp_max() {
-        return temp_max;
-    }
-
-    public void setTemp_max(double temp_max) {
-        this.temp_max = temp_max;
-    }
-
-    public double getTemp_min() {
-        return temp_min;
-    }
-
-    public void setTemp_min(double temp_min) {
-        this.temp_min = temp_min;
     }
 
     public int getPressure() {
@@ -88,12 +61,20 @@ public class CurrentWeather implements Serializable {
         this.visibility = visibility;
     }
 
-    public String getUv() {
+    public double getUv() {
         return uv;
     }
 
-    public void setUv(String uv) {
+    public void setUv(double uv) {
         this.uv = uv;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
     }
 
     public double getSpeed() {
@@ -102,13 +83,5 @@ public class CurrentWeather implements Serializable {
 
     public void setSpeed(double speed) {
         this.speed = speed;
-    }
-
-    public String getDegree() {
-        return degree;
-    }
-
-    public void setDegree(String degree) {
-        this.degree = degree;
     }
 }

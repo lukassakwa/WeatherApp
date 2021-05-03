@@ -1,4 +1,4 @@
-package com.olivier.weatherapp;
+package com.olivier.weatherapp.view;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,13 +15,14 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.olivier.weatherapp.model.HttpModel;
+import com.olivier.weatherapp.R;
+import com.olivier.weatherapp.model.WeatherHttpModel;
 
 import java.util.HashMap;
 
 public class CitiesActivity extends AppCompatActivity {
 
-    private HashMap<String, HttpModel> cityLocationArray;
+    private HashMap<String, WeatherHttpModel> cityLocationArray;
     //Location
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private LocationRequest locationResult;
@@ -43,7 +44,7 @@ public class CitiesActivity extends AppCompatActivity {
 
         Intent mainIntent = getIntent();
         //Resolve back data from sharedpreferences to hashMap
-        cityLocationArray = (HashMap<String, HttpModel>) mainIntent.getSerializableExtra("httpModels");
+        cityLocationArray = (HashMap<String, WeatherHttpModel>) mainIntent.getSerializableExtra("httpModels");
 
         //initialize Buttons
         Button currentButton = findViewById(R.id.currentButton);
@@ -156,7 +157,7 @@ public class CitiesActivity extends AppCompatActivity {
 
     //send Data to Main Activity
     private void sendData(Double lon, Double lat, String name){
-        HttpModel httpModel = new HttpModel();
+        WeatherHttpModel httpModel = new WeatherHttpModel();
         httpModel.setLon(lon);
         httpModel.setLat(lat);
 

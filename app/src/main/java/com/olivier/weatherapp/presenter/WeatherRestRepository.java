@@ -1,4 +1,4 @@
-package com.olivier.weatherapp.Repository;
+package com.olivier.weatherapp.presenter;
 
 import com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel;
 import retrofit2.Call;

@@ -1,4 +1,4 @@
-package com.olivier.weatherapp;
+package com.olivier.weatherapp.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -19,7 +19,8 @@ import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.olivier.weatherapp.model.HttpModel;
+import com.olivier.weatherapp.R;
+import com.olivier.weatherapp.model.WeatherHttpModel;
 import com.olivier.weatherapp.view.fragments.WeatherFragment;
 import com.olivier.weatherapp.view.viewpager.ViewPagerFragmentAdapter;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     Bundle intentBundle = new Bundle();
 
     //HttpModel
-    private HashMap<String, HttpModel> cityLocationArray = new HashMap<>();
+    private HashMap<String, WeatherHttpModel> cityLocationArray = new HashMap<>();
 
     //ViewPager
     private ViewPager2 mViewPager2;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             //setting cities
-            this.cityLocationArray = (HashMap<String, HttpModel>) data.getExtras().getSerializable("httpModels");
+            this.cityLocationArray = (HashMap<String, WeatherHttpModel>) data.getExtras().getSerializable("httpModels");
             SetViewPager();
         }
     }
@@ -182,12 +183,12 @@ public class MainActivity extends AppCompatActivity {
         pSharedPref.edit().putString("cityHashMap", hashMapString).apply();
     }
 
-    private HashMap<String, HttpModel> getPreferences(){
+    private HashMap<String, WeatherHttpModel> getPreferences(){
         SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
         try{
             //get from shared prefs
             String storedHashMapString = pSharedPref.getString("cityHashMap", (new JSONObject()).toString());
-            java.lang.reflect.Type type = new TypeToken<HashMap<String, HttpModel>>(){}.getType();
+            java.lang.reflect.Type type = new TypeToken<HashMap<String, WeatherHttpModel>>(){}.getType();
             Gson gson = new Gson();
             return gson.fromJson(storedHashMapString, type);
         }catch(Exception e){
