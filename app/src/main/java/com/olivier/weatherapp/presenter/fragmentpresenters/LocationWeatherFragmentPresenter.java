@@ -11,6 +11,7 @@ import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
 import com.olivier.weatherapp.model.weathermodels.daily.DailyWeatherModel;
 import com.olivier.weatherapp.model.weathermodels.daily.ListItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
+import com.olivier.weatherapp.model.weathermodels.onecall.HourlyWeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.ContractMVP;
 import retrofit2.Call;
@@ -38,13 +39,13 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<ContractMVP.
         WeatherRestRepository weatherRestRepository = ClientApi.getRetrofit(_weatherModel).create(WeatherRestRepository.class);
 
 
-        Call<com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
+        Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
 
-        Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
+        Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
                 _weatherModel.getUnits(),
@@ -70,23 +71,23 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<ContractMVP.
             }
         });
 
-        oneCall.enqueue(new Callback<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel>() {
+        oneCall.enqueue(new Callback<HourlyWeatherModel>() {
 
             @Override
-            public void onResponse(Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> call, Response<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> response) {
+            public void onResponse(Call<HourlyWeatherModel> call, Response<HourlyWeatherModel> response) {
 
                 if(response.isSuccessful()){
 
-                    com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel weatherModel = response.body();
+                    HourlyWeatherModel hourlyWeatherModel = response.body();
 
-                    _hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
+                    _hourlyWeather = hourlyWeatherInit(hourlyWeatherModel.getHourly());
 
                     view.showHourlyWeather(_hourlyWeather);
                 }
             }
 
             @Override
-            public void onFailure(Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> call, Throwable t) {
+            public void onFailure(Call<HourlyWeatherModel> call, Throwable t) {
                 Log.d("GSON_EXCEPTION", t.toString());
             }
 

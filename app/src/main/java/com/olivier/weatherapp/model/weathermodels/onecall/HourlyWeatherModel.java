@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class WeatherModel{
+public class HourlyWeatherModel {
 
 	@SerializedName("current")
 	private Current current;
