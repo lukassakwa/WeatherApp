@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.CurrentWeather;
-import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.DailyWeather;
+import com.olivier.weatherapp.model.HourlyWeather;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.contract.ContractMVP;
 import com.olivier.weatherapp.presenter.fragmentpresenters.CityWeatherFragmentPresenter;
@@ -161,7 +162,7 @@ public class CityWeatherFragment extends Fragment implements ContractMVP.CityWea
         degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
     }
 
-    private void DayRecyclerView(ArrayList<FutureWeather> dailyDataModels){
+    private void DayRecyclerView(ArrayList<DailyWeather> dailyDataModels){
         weatherDayRaportRecyclerView.setHasFixedSize(true);
         weatherDayRaportRecyclerView.setLayoutManager(weatherDayRaportLayoutManager);
 
@@ -169,7 +170,7 @@ public class CityWeatherFragment extends Fragment implements ContractMVP.CityWea
         weatherDayRaportRecyclerView.setAdapter(weatherDayRaportAdapter);
     }
 
-    private void HourRecyclerView(ArrayList<FutureWeather> forecastDataModels){
+    private void HourRecyclerView(ArrayList<HourlyWeather> forecastDataModels){
         //Do clasy fragmentowej Recycler View
         weatherHourRecyclerView.setHasFixedSize(true);
         weatherHourRecyclerView.setLayoutManager(weatherHourRecyclerViewLayoutManager);
@@ -180,16 +181,21 @@ public class CityWeatherFragment extends Fragment implements ContractMVP.CityWea
 
     //from ContractMVP.View interface
     @Override
-    public void showWeather(ArrayList<FutureWeather> hourlyWeather, ArrayList<FutureWeather> dailyWeather) {
+    public void showHourlyWeather(ArrayList<HourlyWeather> hourlyWeathers) {
+        //Initializing data on hourly recyclerView
+        HourRecyclerView(hourlyWeathers);
+    }
+
+    @Override
+    public void showDailyWeather(ArrayList<DailyWeather> dailyWeathers) {
         //Initializing data on daily recyclerView
-        DayRecyclerView(dailyWeather);
-        HourRecyclerView(hourlyWeather);
+        DayRecyclerView(dailyWeathers);
     }
 
     @Override
     public void showCurrentWeather(CurrentWeather currentWeather) {
         //Initializing widgets
         mainWindowSetWidget(currentWeather);
-
     }
+
 }

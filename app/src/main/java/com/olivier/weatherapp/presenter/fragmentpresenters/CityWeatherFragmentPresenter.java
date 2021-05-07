@@ -4,10 +4,12 @@ import android.util.Log;
 import com.olivier.weatherapp.api.ClientApi;
 import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.CurrentWeather;
-import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.DailyWeather;
+import com.olivier.weatherapp.model.HourlyWeather;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
-import com.olivier.weatherapp.model.weathermodels.onecall.DailyItem;
+import com.olivier.weatherapp.model.weathermodels.daily.DailyWeatherModel;
+import com.olivier.weatherapp.model.weathermodels.daily.ListItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.ContractMVP;
@@ -23,8 +25,8 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
     private WeatherModel _weatherModel;
 
     private CurrentWeather _currentWeather;
-    private ArrayList<FutureWeather> _hourlyWeather;
-    private ArrayList<FutureWeather> _dailyWeather;
+    private ArrayList<HourlyWeather> _hourlyWeather;
+    private ArrayList<DailyWeather> _dailyWeather;
 
     public CityWeatherFragmentPresenter(WeatherModel weatherModel) {
         this._weatherModel = weatherModel;
@@ -41,9 +43,14 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
                 _weatherModel.getAuthorization());
 
 
-        Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> oneCall = weatherRestRepository.getWeather(_weatherModel.getLat(),
+        Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+        Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
@@ -58,7 +65,7 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
 
             @Override
             public void onFailure(Call<CurrentWeatherModel> call, Throwable t) {
-
+                Log.d("GSON_EXCEPTION", t.toString());
             }
         });
 
@@ -71,10 +78,9 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
 
                     com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel weatherModel = response.body();
 
-                    _dailyWeather = dailyWeatherInit(weatherModel.getDaily());
                     _hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
 
-                    view.showWeather(_hourlyWeather, _dailyWeather);
+                    view.showHourlyWeather(_hourlyWeather);
                 }
             }
 
@@ -83,6 +89,22 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
                 Log.d("GSON_EXCEPTION", t.toString());
             }
 
+        });
+
+        dailyWeatherModelCall.enqueue(new Callback<DailyWeatherModel>() {
+            @Override
+            public void onResponse(Call<DailyWeatherModel> call, Response<DailyWeatherModel> response) {
+
+                DailyWeatherModel dailyWeatherModel = response.body();
+
+                _dailyWeather = dailyWeatherInit(dailyWeatherModel.getList());
+                view.showDailyWeather(_dailyWeather);
+            }
+
+            @Override
+            public void onFailure(Call<DailyWeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
         });
     }
 
@@ -104,15 +126,16 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
         return currentWeather;
     }
 
-    //Initializing Future Weather model for day
-    private ArrayList<FutureWeather> dailyWeatherInit(List<DailyItem> dailyItem){
-        ArrayList<FutureWeather> futureWeathers = new ArrayList<>();
+    //Initializing hour Weather model for day
+    private ArrayList<DailyWeather> dailyWeatherInit(List<ListItem> dailyItem){
+        ArrayList<DailyWeather> futureWeathers = new ArrayList<>();
 
         //DailyInit
         for(int i = 0; i < dailyItem.size()-1; i++){
             //Reading from Json Pojo
-            FutureWeather futureWeather = new FutureWeather();
-            futureWeather.setTemp(dailyItem.get(i).getTemp().getDay());
+            DailyWeather futureWeather = new DailyWeather();
+            futureWeather.setMinTemp(dailyItem.get(i).getTemp().getMin());
+            futureWeather.setMaxTemp(dailyItem.get(i).getTemp().getMax());
             futureWeather.setDescription(dailyItem.get(i).getWeather().get(0).getDescription());
             futureWeather.setIcon(dailyItem.get(i).getWeather().get(0).getIcon());
             futureWeather.setDt(dailyItem.get(i).getDt());
@@ -123,13 +146,13 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
     }
 
     //Initializing Future Weather model for hour
-    private ArrayList<FutureWeather> hourlyWeatherInit(List<HourlyItem> hourlyItem){
-        ArrayList<FutureWeather> hourlyWeathers = new ArrayList<>();
+    private ArrayList<HourlyWeather> hourlyWeatherInit(List<HourlyItem> hourlyItem){
+        ArrayList<HourlyWeather> hourlyWeathers = new ArrayList<>();
 
         //HourlyInit
         for(int i = 1; i <= 24; i++){
             //Reading from Json Pojo
-            FutureWeather hourlyWeather = new FutureWeather();
+            HourlyWeather hourlyWeather = new HourlyWeather();
             hourlyWeather.setTemp(hourlyItem.get(i).getTemp());
             hourlyWeather.setDescription(hourlyItem.get(i).getWeather().get(0).getDescription());
             hourlyWeather.setIcon(hourlyItem.get(i).getWeather().get(0).getIcon());

@@ -1,7 +1,8 @@
 package com.olivier.weatherapp.presenter.contract;
 
 import com.olivier.weatherapp.model.CurrentWeather;
-import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.DailyWeather;
+import com.olivier.weatherapp.model.HourlyWeather;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresenter;
 
@@ -32,12 +33,14 @@ public interface ContractMVP {
     }
 
     interface LocationWeatherFragmentView{
-        void showWeather(ArrayList<FutureWeather> hourlyWeathers, ArrayList<FutureWeather> dailyWeathers);
+        void showHourlyWeather(ArrayList<HourlyWeather> hourlyWeathers);
+        void showDailyWeather(ArrayList<DailyWeather> dailyWeathers);
         void showCurrentWeather(CurrentWeather currentWeather);
     }
 
     interface CityWeatherFragmentView{
-        void showWeather(ArrayList<FutureWeather> hourlyWeathers, ArrayList<FutureWeather> dailyWeathers);
+        void showHourlyWeather(ArrayList<HourlyWeather> hourlyWeathers);
+        void showDailyWeather(ArrayList<DailyWeather> dailyWeathers);
         void showCurrentWeather(CurrentWeather currentWeather);
     }
 

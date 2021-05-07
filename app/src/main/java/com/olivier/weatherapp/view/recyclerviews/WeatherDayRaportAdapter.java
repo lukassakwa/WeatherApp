@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.DailyWeather;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormatSymbols;
@@ -19,7 +19,7 @@ import java.util.TimeZone;
 
 public class WeatherDayRaportAdapter extends RecyclerView.Adapter<WeatherDayRaportAdapter.ViewHolder> {
 
-    private final ArrayList<FutureWeather> dailyDataModels;
+    private final ArrayList<DailyWeather> dailyDataModels;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView dateTextView;
@@ -39,7 +39,7 @@ public class WeatherDayRaportAdapter extends RecyclerView.Adapter<WeatherDayRapo
         }
     }
 
-    public WeatherDayRaportAdapter(ArrayList<FutureWeather> dailyDataModels){
+    public WeatherDayRaportAdapter(ArrayList<DailyWeather> dailyDataModels){
         this.dailyDataModels = dailyDataModels;
     }
 
@@ -78,8 +78,9 @@ public class WeatherDayRaportAdapter extends RecyclerView.Adapter<WeatherDayRapo
         String description = dailyDataModels.get(position).getDescription();
         holder.weatherDescriptionTextView.setText(description);
 
-        int temp = (int) dailyDataModels.get(position).getTemp();
-        holder.temperatureTextViewItem.setText(temp+"\u2103");
+        int tempMin = (int) dailyDataModels.get(position).getMinTemp();
+        int tempMax = (int) dailyDataModels.get(position).getMaxTemp();
+        holder.temperatureTextViewItem.setText(tempMin + "/" + tempMax +"\u2103");
 
         String urlDisplay = "http://openweathermap.org/img/wn/" + dailyDataModels.get(position).getIcon() + "@2x.png";
         Picasso.get().load(urlDisplay).into(holder.weatherImageView);

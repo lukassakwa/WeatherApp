@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.HourlyWeather;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -18,7 +18,7 @@ import java.util.Date;
 public class WeatherHourAdapter extends RecyclerView.Adapter<WeatherHourAdapter.ViewHolder> {
 
     //private final List<String> hoursString;
-    private ArrayList<FutureWeather> weatherList;
+    private ArrayList<HourlyWeather> weatherList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         //private static final String TAG = "WeatherHourAdapter";
@@ -43,7 +43,7 @@ public class WeatherHourAdapter extends RecyclerView.Adapter<WeatherHourAdapter.
 
     }
 
-    public WeatherHourAdapter(ArrayList<FutureWeather> weatherList){
+    public WeatherHourAdapter(ArrayList<HourlyWeather> weatherList){
         //Konstruktor do kteorego bede przesylal dane ktore chce wyswietlic w itemie w RecyclerView
         //this.hoursString = hoursString;
         this.weatherList = weatherList;

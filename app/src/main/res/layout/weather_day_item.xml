@@ -36,13 +36,13 @@
                 android:textAlignment="textStart"
                 app:layout_constraintStart_toEndOf="@+id/dateTextView" app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginBottom="3dp" app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="2dp" android:layout_marginStart="30dp"/>
+                android:layout_marginTop="2dp" android:layout_marginStart="20dp"/>
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/ic_checked_checkbox"
                 android:id="@+id/weatherImageViewItem"
                 app:layout_constraintStart_toEndOf="@+id/dayTextView" app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="30dp"/>
+                app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="20dp"/>
         <TextView
                 android:text="rain and snow"
                 android:layout_width="200px"
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content" android:id="@+id/weatherDescriptionTextViewItem"
                 android:textAlignment="textStart"
                 app:layout_constraintStart_toEndOf="@+id/weatherImageViewItem" app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="20dp"/>
+                app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="15dp"/>
         <TextView
                 android:text="8 \u2103"
                 android:layout_width="wrap_content"
@@ -59,6 +59,6 @@
                 android:textAlignment="center" android:textAllCaps="false"
                 app:layout_constraintStart_toEndOf="@+id/weatherDescriptionTextViewItem"
                 app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="30dp" app:layout_constraintEnd_toEndOf="parent"/>
+                android:layout_marginStart="20dp" app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

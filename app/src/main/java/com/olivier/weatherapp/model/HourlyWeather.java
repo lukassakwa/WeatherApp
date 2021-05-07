@@ -2,11 +2,11 @@ package com.olivier.weatherapp.model;
 
 import java.io.Serializable;
 
-public class FutureWeather implements Serializable {
+public class HourlyWeather implements Serializable {
     private int dt;
-    private double temp;
     private String description;
     private String icon;
+    private double temp;
 
     public int getDt() {
         return dt;
@@ -39,4 +39,5 @@ public class FutureWeather implements Serializable {
     public void setTemp(double temp) {
         this.temp = temp;
     }
+
 }

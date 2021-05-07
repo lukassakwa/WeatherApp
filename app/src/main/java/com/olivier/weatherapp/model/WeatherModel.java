@@ -7,7 +7,7 @@ public class WeatherModel implements Serializable{
     private Double lon = 0.0;
     private Double lat = 0.0;
     private String units = "metric";
-    private String excludes = "current,minutely";
+    private String excludes = "current,daily,minutely";
     private String authorization = "your appid";
     private String city = "";
 
