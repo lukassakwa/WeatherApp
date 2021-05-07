@@ -15,5 +15,4 @@ public abstract class BasePresenter<T> {
     public boolean isViewAttach(){
         return this.view != null;
     }
-
 }

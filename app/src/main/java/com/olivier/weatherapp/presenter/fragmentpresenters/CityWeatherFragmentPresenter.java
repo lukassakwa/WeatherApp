@@ -1,0 +1,162 @@
+package com.olivier.weatherapp.presenter.fragmentpresenters;
+
+import android.util.Log;
+import com.olivier.weatherapp.api.ClientApi;
+import com.olivier.weatherapp.api.WeatherRestRepository;
+import com.olivier.weatherapp.model.CurrentWeather;
+import com.olivier.weatherapp.model.FutureWeather;
+import com.olivier.weatherapp.model.WeatherModel;
+import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
+import com.olivier.weatherapp.model.weathermodels.onecall.DailyItem;
+import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
+import com.olivier.weatherapp.presenter.BasePresenter;
+import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.CityWeatherFragmentView> implements ContractMVP.WeatherFragmentPresenter {
+
+    private WeatherModel _weatherModel;
+
+    private CurrentWeather _currentWeather;
+    private ArrayList<FutureWeather> _hourlyWeather;
+    private ArrayList<FutureWeather> _dailyWeather;
+
+    public CityWeatherFragmentPresenter(WeatherModel weatherModel) {
+        this._weatherModel = weatherModel;
+    }
+
+    @Override
+    public void getWeather() {
+        WeatherRestRepository weatherRestRepository = ClientApi.getRetrofit(_weatherModel).create(WeatherRestRepository.class);
+
+
+        Call<com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+
+        Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> oneCall = weatherRestRepository.getWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
+                _weatherModel.getExcludes(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+        currentWeatherModelCall.enqueue(new Callback<CurrentWeatherModel>() {
+            @Override
+            public void onResponse(Call<CurrentWeatherModel> call, Response<CurrentWeatherModel> response) {
+                CurrentWeatherModel currentWeatherModel = response.body();
+                _currentWeather = currentWeatherInit(currentWeatherModel);
+
+                view.showCurrentWeather(_currentWeather);
+            }
+
+            @Override
+            public void onFailure(Call<CurrentWeatherModel> call, Throwable t) {
+
+            }
+        });
+
+        oneCall.enqueue(new Callback<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel>() {
+
+            @Override
+            public void onResponse(Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> call, Response<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> response) {
+
+                if(response.isSuccessful()){
+
+                    com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel weatherModel = response.body();
+
+                    _dailyWeather = dailyWeatherInit(weatherModel.getDaily());
+                    _hourlyWeather = hourlyWeatherInit(weatherModel.getHourly());
+
+                    view.showWeather(_hourlyWeather, _dailyWeather);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.olivier.weatherapp.model.weathermodels.onecall.WeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+
+        });
+    }
+
+    //Initializing current and future model object
+    private CurrentWeather currentWeatherInit(CurrentWeatherModel current){
+        CurrentWeather currentWeather = new CurrentWeather();
+        //Reading from Json Pojo
+        currentWeather.setName(current.getName());
+        currentWeather.setTemp(current.getMain().getTemp());
+        currentWeather.setDescription(current.getWeather().get(0).getDescription());
+        currentWeather.setFeels_temp(current.getMain().getFeelsLike());
+        currentWeather.setVisibility(current.getVisibility());
+        currentWeather.setPressure(current.getMain().getPressure());
+        currentWeather.setSpeed(current.getWind().getSpeed());
+        //windDirection
+        currentWeather.setDegree(windDirection(current.getWind().getDeg()));
+        currentWeather.setHumidity(current.getMain().getHumidity());
+
+        return currentWeather;
+    }
+
+    //Initializing Future Weather model for day
+    private ArrayList<FutureWeather> dailyWeatherInit(List<DailyItem> dailyItem){
+        ArrayList<FutureWeather> futureWeathers = new ArrayList<>();
+
+        //DailyInit
+        for(int i = 0; i < dailyItem.size()-1; i++){
+            //Reading from Json Pojo
+            FutureWeather futureWeather = new FutureWeather();
+            futureWeather.setTemp(dailyItem.get(i).getTemp().getDay());
+            futureWeather.setDescription(dailyItem.get(i).getWeather().get(0).getDescription());
+            futureWeather.setIcon(dailyItem.get(i).getWeather().get(0).getIcon());
+            futureWeather.setDt(dailyItem.get(i).getDt());
+            futureWeathers.add(futureWeather);
+        }
+
+        return futureWeathers;
+    }
+
+    //Initializing Future Weather model for hour
+    private ArrayList<FutureWeather> hourlyWeatherInit(List<HourlyItem> hourlyItem){
+        ArrayList<FutureWeather> hourlyWeathers = new ArrayList<>();
+
+        //HourlyInit
+        for(int i = 1; i <= 24; i++){
+            //Reading from Json Pojo
+            FutureWeather hourlyWeather = new FutureWeather();
+            hourlyWeather.setTemp(hourlyItem.get(i).getTemp());
+            hourlyWeather.setDescription(hourlyItem.get(i).getWeather().get(0).getDescription());
+            hourlyWeather.setIcon(hourlyItem.get(i).getWeather().get(0).getIcon());
+            hourlyWeather.setDt(hourlyItem.get(i).getDt());
+            hourlyWeathers.add(hourlyWeather);
+        }
+
+        return hourlyWeathers;
+    }
+
+    //Parse Wind direction degree to String value
+    private String windDirection(int deg){
+        if(deg >= 350 || deg <= 10)
+            return "N";
+        if(deg < 80)
+            return "NE";
+        if(deg <= 110)
+            return "E";
+        if(deg < 170)
+            return "SE";
+        if(deg <= 190)
+            return "S";
+        if(deg < 260)
+            return "SW";
+        if(deg <= 280)
+            return "W";
+        return "NW";
+    }
+
+}

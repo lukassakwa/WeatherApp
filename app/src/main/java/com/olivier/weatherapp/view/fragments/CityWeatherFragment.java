@@ -17,23 +17,23 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.FutureWeather;
-import com.olivier.weatherapp.model.WeatherHttpModel;
-import com.olivier.weatherapp.presenter.ContractMVP;
-import com.olivier.weatherapp.presenter.WeatherController;
+import com.olivier.weatherapp.model.WeatherModel;
+import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.fragmentpresenters.CityWeatherFragmentPresenter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherDayRaportAdapter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherHourAdapter;
 
 import java.util.ArrayList;
 
-public class WeatherFragment extends Fragment implements ContractMVP.WeatherView {
+public class CityWeatherFragment extends Fragment implements ContractMVP.CityWeatherFragmentView {
     //Presenter
-    private WeatherController weatherController;
+    private CityWeatherFragmentPresenter cityWeatherFragmentPresenter;
 
     //Context
     private final FragmentActivity contextWeather;
 
-    //HttpModel
-    private WeatherHttpModel weather;
+    //Refresh Swipe
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     //Recycler View hours
     private RecyclerView weatherHourRecyclerView;
@@ -54,10 +54,9 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
     private TextView visibilityTextView;
     private TextView speedTextView;
     private TextView degreeTextView;
-    private TextView uvTextView;
     private TextView cityNameTextView;
 
-    public WeatherFragment(Context context){
+    public CityWeatherFragment(Context context){
         this.contextWeather = (FragmentActivity) context;
     }
 
@@ -69,11 +68,12 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         weatherDayRaportLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.VERTICAL, false);
 
         //Weather model data from bundle;
-        weather = (WeatherHttpModel) getArguments().getSerializable("httpModel");
+        WeatherModel weather = (WeatherModel) getArguments().getSerializable("httpModel");
 
         //presenter
-        weatherController = new WeatherController(weather);
-        weatherController.attach(this);
+        cityWeatherFragmentPresenter = new CityWeatherFragmentPresenter(weather);
+        cityWeatherFragmentPresenter.attach(this);
+        cityWeatherFragmentPresenter.getWeather();
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -94,6 +94,7 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         //Init Main Activity Widgets
         InitWidgets(view);
 
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         weatherHourRecyclerView = view.findViewById(R.id.weatherHourRecyclerView);
         weatherDayRaportRecyclerView = view.findViewById(R.id.weatherDayRaportRecyclerView);
 
@@ -122,16 +123,11 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
             }
         });
 
-        //InitRecyclerView
-        weatherController.getWeather();
-
-        //Refresh Swipe
         //Allow user to refresh weather data
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                weatherController.getWeather();
+                cityWeatherFragmentPresenter.getWeather();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -147,24 +143,20 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
         humidityTextView = view.findViewById(R.id.humidityTextView);
         visibilityTextView = view.findViewById(R.id.visibilityTextView);
         speedTextView = view.findViewById(R.id.windSpeedTextView);
-        uvTextView = view.findViewById(R.id.uvTextView);
         degreeTextView = view.findViewById(R.id.windDirectionTextView);
         cityNameTextView = view.findViewById(R.id.cityTextView);
     }
 
     public void mainWindowSetWidget(CurrentWeather firstWeatherElement) {
         //Initialize widget from main Window
+        cityNameTextView.setText(firstWeatherElement.getName());
         mainTemperatureTextView.setText((int) firstWeatherElement.getTemp() + "");
         weatherDescriptionTextView.setText(firstWeatherElement.getDescription());
-        //getLocation
-        weatherController.getLocationName(contextWeather);
         feels_tempTextView.setText((int) firstWeatherElement.getFeels_temp() + "\u2103");
         pressureTextView.setText(firstWeatherElement.getPressure() + "hPa");
         humidityTextView.setText(firstWeatherElement.getHumidity() + "%");
         visibilityTextView.setText(firstWeatherElement.getVisibility() + "km");
         speedTextView.setText((int) firstWeatherElement.getSpeed() + "km/h");
-        //uv ALert
-        uvTextView.setText(firstWeatherElement.getUv() + "");
         //windDirection
         degreeTextView.setText(firstWeatherElement.getDegree() + " wind");
     }
@@ -188,17 +180,16 @@ public class WeatherFragment extends Fragment implements ContractMVP.WeatherView
 
     //from ContractMVP.View interface
     @Override
-    public void showWeather(CurrentWeather currentWeather, ArrayList<FutureWeather> hourlyWeather, ArrayList<FutureWeather> dailyWeather) {
+    public void showWeather(ArrayList<FutureWeather> hourlyWeather, ArrayList<FutureWeather> dailyWeather) {
         //Initializing data on daily recyclerView
         DayRecyclerView(dailyWeather);
         HourRecyclerView(hourlyWeather);
-        //Initializing widgets
-        mainWindowSetWidget(currentWeather);
     }
 
     @Override
-    public void showName(String cityName) {
-        //setLocationName
-        cityNameTextView.setText(cityName);
+    public void showCurrentWeather(CurrentWeather currentWeather) {
+        //Initializing widgets
+        mainWindowSetWidget(currentWeather);
+
     }
 }

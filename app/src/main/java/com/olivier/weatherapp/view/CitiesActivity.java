@@ -1,34 +1,35 @@
 package com.olivier.weatherapp.view;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.model.WeatherHttpModel;
+import com.olivier.weatherapp.model.WeatherModel;
+import com.olivier.weatherapp.presenter.activitypresenters.CitiesActivityPresenter;
+import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresenter;
+import com.olivier.weatherapp.view.recyclerviews.CitiesAdapter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
-public class CitiesActivity extends AppCompatActivity {
+public class CitiesActivity extends AppCompatActivity implements ContractMVP.CitiesActivityView {
 
-    private HashMap<String, WeatherHttpModel> cityLocationArray;
-    //Location
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-    private LocationRequest locationResult;
+    //Presenter for City recycler view
+    private CitiesActivityPresenter citiesActivityPresenter;
 
-    private final Intent intent = new Intent();
-    private final Bundle bundle = new Bundle();
+    private Intent intent;
+    private Bundle bundle;
+
+    private RecyclerView citiesRecyclerView;
+    private RecyclerView.Adapter citiesAdapter;
+    private RecyclerView.LayoutManager citiesLayoutManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,79 +37,26 @@ public class CitiesActivity extends AppCompatActivity {
         setContentView(R.layout.cities_activity);
 
         //Setting toolbar elements
-        Toolbar toolbar = findViewById(R.id.cities_toolbar);
-        setSupportActionBar(toolbar);
-        TextView mToolbarTitle = findViewById(R.id.cities_toolbar_title);
-        mToolbarTitle.setText(toolbar.getTitle());
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initToolbar();
 
+        bundle = new Bundle();
+        intent = new Intent();
+
+        //get weather list from main activity
         Intent mainIntent = getIntent();
-        //Resolve back data from sharedpreferences to hashMap
-        cityLocationArray = (HashMap<String, WeatherHttpModel>) mainIntent.getSerializableExtra("httpModels");
+        ArrayList<WeatherModel> cityLocationArray = (ArrayList<WeatherModel>) mainIntent.getSerializableExtra("httpModels");
 
-        //initialize Buttons
-        Button currentButton = findViewById(R.id.currentButton);
-        Button warsawButton = findViewById(R.id.warsawButton);
-        Button krakowButton = findViewById(R.id.krakowButton);
-
-        //location
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        //Todo:: optimize this fragment of code
-        if(cityLocationArray.containsKey("current"))
-            currentButton.setBackground(getDrawable(R.drawable.city_button_light));
-        else
-            currentButton.setBackground(getDrawable(R.drawable.city_button));
-
-        if(cityLocationArray.containsKey("Warsaw"))
-            warsawButton.setBackground(getDrawable(R.drawable.city_button_light));
-        else
-            warsawButton.setBackground(getDrawable(R.drawable.city_button));
-
-        if(cityLocationArray.containsKey("Krakow"))
-            krakowButton.setBackground(getDrawable(R.drawable.city_button_light));
-        else
-            krakowButton.setBackground(getDrawable(R.drawable.city_button));
-
-        //TODO:: background buttons
-        //TODO:: add or remove city when button press
-        currentButton.setOnClickListener((v)-> {
-            if(cityLocationArray.containsKey("current")){
-                currentButton.setBackground(getDrawable(R.drawable.city_button));
-                cityLocationArray.remove("current");
-            }else{
-                currentButton.setBackground(getDrawable(R.drawable.city_button_light));
-                getLocation();
-            }
-        });
-
-        warsawButton.setOnClickListener((v) -> {
-            if(cityLocationArray.containsKey("Warsaw")){
-                warsawButton.setBackground(getDrawable(R.drawable.city_button));
-                cityLocationArray.remove("Warsaw");
-            }else{
-                warsawButton.setBackground(getDrawable(R.drawable.city_button_light));
-                sendData(21.017532, 52.237049, "Warsaw");
-            }
-        });
-
-        krakowButton.setOnClickListener((v) -> {
-            if(cityLocationArray.containsKey("Krakow")){
-                krakowButton.setBackground(getDrawable(R.drawable.city_button));
-                cityLocationArray.remove("Krakow");
-            }else{
-                krakowButton.setBackground(getDrawable(R.drawable.city_button_light));
-                sendData(19.944544, 50.049683, "Krakow");
-            }
-        });
+        //Init presenter
+        citiesActivityPresenter = new CitiesActivityPresenter(cityLocationArray);
+        citiesActivityPresenter.attach(this);
+        citiesActivityPresenter.getInitRecyclerView();
     }
 
     //Menu 3 kropki w prawym gornym rogu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-
+        getMenuInflater().inflate(R.menu.cities_menu, menu);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return true;
     }
@@ -122,7 +70,10 @@ public class CitiesActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
             case android.R.id.home:
-                onExitActivity();
+                citiesActivityPresenter.exitCityActivity();
+                return true;
+            case R.id.add_item:
+                citiesActivityPresenter.getIntentSearchActivity();
                 return true;
             default:
                 break;
@@ -131,46 +82,49 @@ public class CitiesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressLint("MissingPermission")
-    private void getLocation(){
-        //Device location
-        mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location == null) {
-                    //Device Location
-                    locationResult = LocationRequest.create();
-                    locationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    locationResult.setInterval(20 * 1000);
-                }
-
-                sendData(location.getLongitude(), location.getLatitude(), "current");
-            }
-        });
-    }
-
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        onExitActivity();
-    }
-
-    //send Data to Main Activity
-    private void sendData(Double lon, Double lat, String name){
-        WeatherHttpModel httpModel = new WeatherHttpModel();
-        httpModel.setLon(lon);
-        httpModel.setLat(lat);
-
-        cityLocationArray.put(name, httpModel);
-
-        onExitActivity();
+        citiesActivityPresenter.exitCityActivity();
     }
 
     //Exit from Intent
-    private void onExitActivity(){
-        bundle.putSerializable("httpModels", cityLocationArray);
+    @Override
+    public void onExitActivity(ArrayList<WeatherModel> weatherModels) {
+        bundle.putSerializable("httpModels", weatherModels);
         intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
         finish();
     }
+
+    @Override
+    public void initRecyclerView(CitiesRVPresenter citiesRVPresenter) {
+        citiesRecyclerView = findViewById(R.id.citiesRecyclerView);
+
+        citiesLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        citiesRecyclerView.setLayoutManager(citiesLayoutManager);
+
+        citiesAdapter = new CitiesAdapter(citiesRVPresenter);
+        citiesRecyclerView.setAdapter(citiesAdapter);
+    }
+
+    @Override
+    public void intentSearchActivity(ArrayList<WeatherModel> weatherModels) {
+        Intent searchIntent = new Intent(this, SearchActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("httpModels", weatherModels);
+        searchIntent.putExtras(bundle);
+        startActivity(searchIntent);
+    }
+
+    private void initToolbar(){
+        Toolbar toolbar = findViewById(R.id.cities_toolbar);
+        setSupportActionBar(toolbar);
+
+        TextView mToolbarTitle = findViewById(R.id.cities_toolbar_title);
+        mToolbarTitle.setText(toolbar.getTitle());
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
 }

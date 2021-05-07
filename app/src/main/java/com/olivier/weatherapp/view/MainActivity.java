@@ -10,26 +10,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.model.WeatherHttpModel;
-import com.olivier.weatherapp.view.fragments.WeatherFragment;
+import com.olivier.weatherapp.model.WeatherModel;
+import com.olivier.weatherapp.presenter.activitypresenters.MainActivityPresenter;
+import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.view.fragments.CityWeatherFragment;
+import com.olivier.weatherapp.view.fragments.LocationWeatherFragment;
 import com.olivier.weatherapp.view.viewpager.ViewPagerFragmentAdapter;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ContractMVP.MainActivityView {
+
+    //TODO:: permission check to another class
 
     //Location cod
     private static final String PREFS_NAME = "PrefMain";
@@ -39,13 +45,18 @@ public class MainActivity extends AppCompatActivity {
     //Bundle
     Bundle intentBundle = new Bundle();
 
-    //HttpModel
-    private HashMap<String, WeatherHttpModel> cityLocationArray = new HashMap<>();
+    //Shared Preferences
+    private SharedPreferences pSharedPref;
+
+    //presenter
+    private MainActivityPresenter mMainActivityPresenter;
+
+    //intent
+    private Intent intentCity;
 
     //ViewPager
     private ViewPager2 mViewPager2;
     private ViewPagerFragmentAdapter mAdapter;
-    private ArrayList<Fragment> arrayList = new ArrayList<>();
 
 
     @Override
@@ -54,27 +65,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Toolbar setting
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        TextView mToolbarTitle = findViewById(R.id.toolbar_title);
-        setSupportActionBar(toolbar);
-        mToolbarTitle.setText(toolbar.getTitle());
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initToolbar();
 
         //ViewPager
         mViewPager2 = findViewById(R.id.view_pager);
 
-        //TODO: Do naprawienia rozpisania itp.
+        pSharedPref = this.getSharedPreferences(PREFS_NAME, MainActivity.MODE_PRIVATE);
+        intentCity = new Intent(this, CitiesActivity.class);
+
         //Permission check
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        permissionCheck();
 
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    LOCATION_PERMISSION_CODE);
-        }
+        //update Weather
+        //getting updated Location weatherModel from fragment
+        getSupportFragmentManager().setFragmentResultListener("requestWeatherObject", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                WeatherModel weatherModel = (WeatherModel) result.getSerializable("weatherObject");
+                mMainActivityPresenter.setLocationWeather(weatherModel);
+            }
+        });
 
-        //get saved hash map from peferences
-        cityLocationArray = getPreferences();
-        SetViewPager();
+        //get saved ArrayList from peferences
+        mMainActivityPresenter = new MainActivityPresenter();
+        mMainActivityPresenter.attach(this);
+        mMainActivityPresenter.getArrayFromPreferences();
+        mMainActivityPresenter.getViewPager();
     }
 
     //When user decide to give app permission or not
@@ -88,18 +104,14 @@ public class MainActivity extends AppCompatActivity {
             case LOCATION_PERMISSION_CODE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //Todo: intent to window with city choice
-                    Intent intentCity = new Intent(this, CitiesActivity.class);
-                    intentBundle.putSerializable("httpModels", cityLocationArray);
-                    intentCity.putExtras(intentBundle);
-                    startActivityForResult(intentCity, REQUEST_CODE);
+
+                    mMainActivityPresenter.getIntentCity();
+
                 } else {
                     Toast.makeText(this, "Location is needed to get weather", Toast.LENGTH_SHORT).show();
                 }
                 return;
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
     }
 
     @Override
@@ -107,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             //setting cities
-            this.cityLocationArray = (HashMap<String, WeatherHttpModel>) data.getExtras().getSerializable("httpModels");
-            SetViewPager();
+            mMainActivityPresenter.setCityLocationArray((ArrayList<WeatherModel>) data.getExtras().getSerializable("httpModels"));
+            mMainActivityPresenter.getViewPager();
         }
     }
 
@@ -137,10 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case android.R.id.home:
                 //Todo: intent to window with city choice
-                Intent intentCity = new Intent(this, CitiesActivity.class);
-                intentBundle.putSerializable("httpModels", cityLocationArray);
-                intentCity.putExtras(intentBundle);
-                startActivityForResult(intentCity, REQUEST_CODE);
+                mMainActivityPresenter.getIntentCity();
                 return true;
             default:
                 break;
@@ -149,16 +158,44 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void SetViewPager() {
-        arrayList.clear();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMainActivityPresenter.saveArrayToPreferences();
+    }
 
-        //Init Fragments
-        for(String i : cityLocationArray.keySet()){
-            Bundle fragmentBundle = new Bundle();
+    /**
+     * view methods
+     */
+    @Override
+    public void cityIntent(ArrayList<WeatherModel> cityLocationArray){
+        intentBundle.putSerializable("httpModels", cityLocationArray);
+        intentCity.putExtras(intentBundle);
+        startActivityForResult(intentCity, REQUEST_CODE);
+    }
+
+    @Override
+    public void SetViewPager(ArrayList<WeatherModel> cityLocationArray) {
+        ArrayList<Fragment> arrayList = new ArrayList<>();
+        Bundle fragmentBundle;
+
+        //init city fragments
+        for(int i = 0; i < cityLocationArray.size(); i++){
+
+            fragmentBundle = new Bundle();
             fragmentBundle.putSerializable("httpModel", (Serializable) cityLocationArray.get(i));
-            WeatherFragment mainWeatherFragment = new WeatherFragment(MainActivity.this);
-            mainWeatherFragment.setArguments(fragmentBundle);
-            arrayList.add(mainWeatherFragment);
+
+            String city = cityLocationArray.get(i).getCity();
+
+            if(city.equals("current")){
+                LocationWeatherFragment cityWeatherFragment = new LocationWeatherFragment(MainActivity.this);
+                cityWeatherFragment.setArguments(fragmentBundle);
+                arrayList.add(cityWeatherFragment);
+            }else{
+                CityWeatherFragment cityWeatherFragment = new CityWeatherFragment(MainActivity.this);
+                cityWeatherFragment.setArguments(fragmentBundle);
+                arrayList.add(cityWeatherFragment);
+            }
         }
 
         mAdapter = new ViewPagerFragmentAdapter(getSupportFragmentManager(), getLifecycle(), arrayList);
@@ -169,33 +206,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        setPreferences();
-    }
-
-    //Saving HashMap
-    private void setPreferences(){
-        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String hashMapString = gson.toJson(cityLocationArray);
-        //save in shared prefs
-        pSharedPref.edit().putString("cityHashMap", hashMapString).apply();
-    }
-
-    private HashMap<String, WeatherHttpModel> getPreferences(){
-        SharedPreferences pSharedPref = this.getSharedPreferences(PREFS_NAME, this.MODE_PRIVATE);
+    public void getPreferences(){
         try{
             //get from shared prefs
-            String storedHashMapString = pSharedPref.getString("cityHashMap", (new JSONObject()).toString());
-            java.lang.reflect.Type type = new TypeToken<HashMap<String, WeatherHttpModel>>(){}.getType();
+            String storedCityArrayString = pSharedPref.getString("weatherArray", (new JSONObject()).toString());
+            java.lang.reflect.Type cityType = new TypeToken<ArrayList<WeatherModel>>(){}.getType();
             Gson gson = new Gson();
-            return gson.fromJson(storedHashMapString, type);
+
+            ArrayList<WeatherModel> tempCityArray = gson.fromJson(storedCityArrayString, cityType);
+            if(tempCityArray != null) {
+                mMainActivityPresenter.setCityLocationArray(tempCityArray);
+            }
+
         }catch(Exception e){
             e.printStackTrace();
         }
-
-        return new HashMap<>();
     }
+
+    //Saving ArrayList
+    @Override
+    public void setPreferences(ArrayList<WeatherModel> cityLocationArray){
+        Gson gson = new Gson();
+        String hashMapString = gson.toJson(cityLocationArray);
+        //save in shared prefs
+        pSharedPref.edit().putString("weatherArray", hashMapString).apply();
+    }
+
+    /**
+     * MainACtivity methoods
+     */
+
+    private void permissionCheck(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_CODE);
+        }
+    }
+
+    private void initToolbar(){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView mToolbarTitle = findViewById(R.id.toolbar_title);
+        setSupportActionBar(toolbar);
+        mToolbarTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+
 }

@@ -10,20 +10,23 @@ import java.util.ArrayList;
 
 public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
 
-    ArrayList<Fragment> fragments;
-    public ViewPagerFragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, ArrayList<Fragment> fragments) {
+    private final ArrayList<Fragment> mWeatherFragments;
+
+    public ViewPagerFragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, ArrayList<Fragment> mWeatherFragments) {
         super(fragmentManager, lifecycle);
-        this.fragments = fragments;
+        this.mWeatherFragments = mWeatherFragments;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return fragments.get(position);
+        if(mWeatherFragments.get(position) != null)
+            return mWeatherFragments.get(position);
+        return null;
     }
 
     @Override
     public int getItemCount() {
-        return fragments.size();
+        return mWeatherFragments.size();
     }
 }

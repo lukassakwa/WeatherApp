@@ -2,21 +2,27 @@ package com.olivier.weatherapp.model;
 
 import java.io.Serializable;
 
-public class HttpModel implements Serializable{
-    //Todo: Remove query,cnt add lon lat
+public class WeatherModel implements Serializable{
     private String httpUrl = "https://api.openweathermap.org/data/2.5/";
     private Double lon = 0.0;
     private Double lat = 0.0;
     private String units = "metric";
-    private String excludes = "minutely";
-    private String authorization = "Yout api key";
-    private String query = "";
+    private String excludes = "current,minutely";
+    private String authorization = "your api";
+    private String city = "";
 
-    public HttpModel() {
+    public WeatherModel() {
     }
 
-    public HttpModel(String query) {
-        this.query = query;
+    public WeatherModel(Double lon, Double lat) {
+        this.lon = lon;
+        this.lat = lat;
+    }
+
+    public WeatherModel(Double lon, Double lat, String city) {
+        this.lon = lon;
+        this.lat = lat;
+        this.city = city;
     }
 
     public Double getLon() {
@@ -39,14 +45,6 @@ public class HttpModel implements Serializable{
         return httpUrl;
     }
 
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
     public String getExcludes() {
         return excludes;
     }
@@ -61,5 +59,13 @@ public class HttpModel implements Serializable{
 
     public String getAuthorization() {
         return authorization;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

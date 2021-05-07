@@ -10,7 +10,6 @@ public class CurrentWeather implements Serializable {
     private int pressure;
     private int humidity;
     private int visibility;
-    private String uv;
     private double speed;
     private String degree;
 
@@ -68,14 +67,6 @@ public class CurrentWeather implements Serializable {
 
     public void setVisibility(int visibility) {
         this.visibility = visibility;
-    }
-
-    public String getUv() {
-        return uv;
-    }
-
-    public void setUv(String uv) {
-        this.uv = uv;
     }
 
     public String getDegree() {
