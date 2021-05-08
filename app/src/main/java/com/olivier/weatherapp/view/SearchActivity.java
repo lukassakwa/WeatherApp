@@ -20,11 +20,11 @@ import com.google.gson.Gson;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.activitypresenters.SearchActivityPresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 
 import java.util.ArrayList;
 
-public class SearchActivity extends AppCompatActivity implements ContractMVP.SearchActivityView {
+public class SearchActivity extends AppCompatActivity implements Contract.SearchActivityView {
 
     //TODO:: move to inner class beacous this is in 2 clas
     private static final String PREFS_NAME = "PrefMain";

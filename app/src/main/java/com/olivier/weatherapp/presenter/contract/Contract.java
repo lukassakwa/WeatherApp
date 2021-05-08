@@ -8,7 +8,7 @@ import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresente
 
 import java.util.ArrayList;
 
-public interface ContractMVP {
+public interface Contract {
 
     /**
      * Represents the View (Activity, Fragment, View subclass) in MVP

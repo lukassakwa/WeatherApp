@@ -24,7 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.activitypresenters.MainActivityPresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 import com.olivier.weatherapp.view.fragments.CityWeatherFragment;
 import com.olivier.weatherapp.view.fragments.LocationWeatherFragment;
 import com.olivier.weatherapp.view.viewpager.ViewPagerFragmentAdapter;
@@ -33,7 +33,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ContractMVP.MainActivityView {
+public class MainActivity extends AppCompatActivity implements Contract.MainActivityView {
 
     //TODO:: permission check to another class
 

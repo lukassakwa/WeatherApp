@@ -19,14 +19,14 @@ import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.DailyWeather;
 import com.olivier.weatherapp.model.HourlyWeather;
 import com.olivier.weatherapp.model.WeatherModel;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 import com.olivier.weatherapp.presenter.fragmentpresenters.CityWeatherFragmentPresenter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherDayRaportAdapter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherHourAdapter;
 
 import java.util.ArrayList;
 
-public class CityWeatherFragment extends Fragment implements ContractMVP.CityWeatherFragmentView {
+public class CityWeatherFragment extends Fragment implements Contract.CityWeatherFragmentView {
     //Presenter
     private CityWeatherFragmentPresenter cityWeatherFragmentPresenter;
 
@@ -179,7 +179,7 @@ public class CityWeatherFragment extends Fragment implements ContractMVP.CityWea
         weatherHourRecyclerView.setAdapter(weatherHourRecyclerViewAdapter);
     }
 
-    //from ContractMVP.View interface
+    //from Contract.View interface
     @Override
     public void showHourlyWeather(ArrayList<HourlyWeather> hourlyWeathers) {
         //Initializing data on hourly recyclerView

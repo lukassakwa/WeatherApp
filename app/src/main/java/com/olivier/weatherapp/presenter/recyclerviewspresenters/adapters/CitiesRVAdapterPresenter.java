@@ -6,12 +6,12 @@ import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CitiesRVAdapterPresenter extends BasePresenter<ContractMVP.CityRVAdapterView> implements ContractMVP.CityRVAdapterPresenter{
+public class CitiesRVAdapterPresenter extends BasePresenter<Contract.CityRVAdapterView> implements Contract.CityRVAdapterPresenter{
 
     private final WeatherModel weatherModel;
 

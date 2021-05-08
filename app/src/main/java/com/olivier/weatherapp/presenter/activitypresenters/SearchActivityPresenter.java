@@ -2,11 +2,11 @@ package com.olivier.weatherapp.presenter.activitypresenters;
 
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 
 import java.util.ArrayList;
 
-public class SearchActivityPresenter extends BasePresenter<ContractMVP.SearchActivityView> implements ContractMVP.SearchActivityPresenter{
+public class SearchActivityPresenter extends BasePresenter<Contract.SearchActivityView> implements Contract.SearchActivityPresenter{
 
     private ArrayList<WeatherModel> weatherModels;
 

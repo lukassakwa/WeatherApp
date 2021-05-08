@@ -13,13 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.activitypresenters.CitiesActivityPresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresenter;
 import com.olivier.weatherapp.view.recyclerviews.CitiesAdapter;
 
 import java.util.ArrayList;
 
-public class CitiesActivity extends AppCompatActivity implements ContractMVP.CitiesActivityView {
+public class CitiesActivity extends AppCompatActivity implements Contract.CitiesActivityView {
 
     //Presenter for City recycler view
     private CitiesActivityPresenter citiesActivityPresenter;

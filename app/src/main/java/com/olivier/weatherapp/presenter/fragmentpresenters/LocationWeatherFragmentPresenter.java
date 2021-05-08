@@ -13,7 +13,7 @@ import com.olivier.weatherapp.model.weathermodels.daily.ListItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyWeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
-import com.olivier.weatherapp.presenter.contract.ContractMVP;
+import com.olivier.weatherapp.presenter.contract.Contract;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -21,7 +21,7 @@ import retrofit2.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationWeatherFragmentPresenter extends BasePresenter<ContractMVP.LocationWeatherFragmentView> implements ContractMVP.WeatherFragmentPresenter {
+public class LocationWeatherFragmentPresenter extends BasePresenter<Contract.LocationWeatherFragmentView> implements Contract.WeatherFragmentPresenter {
 
     private WeatherModel _weatherModel;
 
