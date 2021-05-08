@@ -66,7 +66,7 @@ public interface ContractMVP {
     }
 
     interface SearchActivityPresenter{
-        void addWeather(WeatherModel weatherModel);
+        void addWeather(WeatherModel weatherModel, String cityName);
         void addLocationWeather(WeatherModel weatherModel);
         void saveArrayToPreferences();
         void exit();

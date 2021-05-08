@@ -16,12 +16,37 @@ public class SearchActivityPresenter extends BasePresenter<ContractMVP.SearchAct
 
     @Override
     public void addLocationWeather(WeatherModel weatherModel){
-        weatherModels.add(0, weatherModel);
+        boolean cityExsist = false;
+
+        for(WeatherModel cityWeather : weatherModels){
+            if(cityWeather.getCity().equals("current")){
+                cityExsist = true;
+                break;
+            }
+        }
+
+        if(cityExsist == true){
+            weatherModels.set(0, weatherModel);
+        }else{
+            weatherModels.add(0, weatherModel);
+        }
     }
 
     @Override
-    public void addWeather(WeatherModel weatherModel) {
-        weatherModels.add(weatherModel);
+    public void addWeather(WeatherModel weatherModel, String name) {
+        boolean cityExsist = false;
+
+        for(WeatherModel cityWeather : weatherModels){
+            if(cityWeather.getCity().equals(name)){
+                cityExsist = true;
+                break;
+            }
+        }
+
+        if(cityExsist == false){
+            weatherModels.add(weatherModel);
+        }
+
     }
 
     @Override

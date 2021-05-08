@@ -43,7 +43,6 @@ public class CityWeatherFragmentPresenter extends BasePresenter<ContractMVP.City
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
-
         Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),

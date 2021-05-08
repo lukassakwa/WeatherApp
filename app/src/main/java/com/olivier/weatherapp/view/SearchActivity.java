@@ -77,16 +77,16 @@ public class SearchActivity extends AppCompatActivity implements ContractMVP.Sea
         });
 
         krakowButton.setOnClickListener((v) -> {
-            WeatherModel weatherModel = new WeatherModel(19.9167, 50.0833);
+            WeatherModel weatherModel = new WeatherModel(19.9167, 50.0833, "Krakow");
 
-            mSearchActivityPresenter.addWeather(weatherModel);
+            mSearchActivityPresenter.addWeather(weatherModel, "Krakow");
             mSearchActivityPresenter.exit();
         });
 
         warsawButton.setOnClickListener((v) -> {
-            WeatherModel weatherModel = new WeatherModel(21.012229, 52.229676);
+            WeatherModel weatherModel = new WeatherModel(21.012229, 52.229676, "Warsaw");
 
-            mSearchActivityPresenter.addWeather(weatherModel);
+            mSearchActivityPresenter.addWeather(weatherModel, "Warsaw");
             mSearchActivityPresenter.exit();
         });
 
