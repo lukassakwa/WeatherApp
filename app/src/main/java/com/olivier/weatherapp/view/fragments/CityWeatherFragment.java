@@ -128,8 +128,7 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                cityWeatherFragmentPresenter.getWeather();
-                swipeRefreshLayout.setRefreshing(false);
+                cityWeatherFragmentPresenter.getWeatherUpdate();
             }
         });
     }
@@ -196,6 +195,11 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
     public void showCurrentWeather(CurrentWeather currentWeather) {
         //Initializing widgets
         mainWindowSetWidget(currentWeather);
+    }
+
+    @Override
+    public void viewUpdate() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 }

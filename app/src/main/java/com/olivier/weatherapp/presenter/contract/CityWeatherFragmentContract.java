@@ -12,10 +12,12 @@ public interface CityWeatherFragmentContract {
         void showHourlyWeather(ArrayList<HourlyWeather> hourlyWeathers);
         void showDailyWeather(ArrayList<DailyWeather> dailyWeathers);
         void showCurrentWeather(CurrentWeather currentWeather);
+        void viewUpdate();
     }
 
     interface Presenter{
         void getWeather();
+        void getWeatherUpdate();
     }
 
 }

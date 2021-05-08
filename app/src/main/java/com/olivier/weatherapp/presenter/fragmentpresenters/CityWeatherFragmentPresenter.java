@@ -108,6 +108,86 @@ public class CityWeatherFragmentPresenter extends BasePresenter<CityWeatherFragm
         });
     }
 
+    @Override
+    public void getWeatherUpdate() {
+        WeatherRestRepository weatherRestRepository = ClientApi.getRetrofit(_weatherModel).create(WeatherRestRepository.class);
+
+
+        Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+        Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
+                _weatherModel.getExcludes(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+        Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
+                _weatherModel.getLon(),
+                _weatherModel.getUnits(),
+                _weatherModel.getAuthorization());
+
+        currentWeatherModelCall.enqueue(new Callback<CurrentWeatherModel>() {
+            @Override
+            public void onResponse(Call<CurrentWeatherModel> call, Response<CurrentWeatherModel> response) {
+                CurrentWeatherModel currentWeatherModel = response.body();
+                _currentWeather = currentWeatherInit(currentWeatherModel);
+
+                view.showCurrentWeather(_currentWeather);
+            }
+
+            @Override
+            public void onFailure(Call<CurrentWeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+        });
+
+        oneCall.enqueue(new Callback<HourlyWeatherModel>() {
+
+            @Override
+            public void onResponse(Call<HourlyWeatherModel> call, Response<HourlyWeatherModel> response) {
+
+                if(response.isSuccessful()){
+
+                    HourlyWeatherModel hourlyWeatherModel = response.body();
+
+                    _hourlyWeather = hourlyWeatherInit(hourlyWeatherModel.getHourly());
+
+                    view.showHourlyWeather(_hourlyWeather);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HourlyWeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+
+        });
+
+        dailyWeatherModelCall.enqueue(new Callback<DailyWeatherModel>() {
+            @Override
+            public void onResponse(Call<DailyWeatherModel> call, Response<DailyWeatherModel> response) {
+
+                DailyWeatherModel dailyWeatherModel = response.body();
+
+                _dailyWeather = dailyWeatherInit(dailyWeatherModel.getList());
+                view.showDailyWeather(_dailyWeather);
+
+                //set swipe false
+                //this function is here because dailyWeatherModelCall will be the last one async function
+                view.viewUpdate();
+            }
+
+            @Override
+            public void onFailure(Call<DailyWeatherModel> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+        });
+
+    }
+
     //Initializing current and future model object
     private CurrentWeather currentWeatherInit(CurrentWeatherModel current){
         CurrentWeather currentWeather = new CurrentWeather();
