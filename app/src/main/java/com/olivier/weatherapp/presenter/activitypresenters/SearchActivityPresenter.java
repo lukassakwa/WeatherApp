@@ -16,17 +16,16 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
 
     @Override
     public void addLocationWeather(WeatherModel weatherModel){
-        boolean cityExsist = false;
 
-        for(WeatherModel cityWeather : weatherModels){
+        if(!weatherModels.isEmpty()){
+            WeatherModel cityWeather = weatherModels.get(0);
+
             if(cityWeather.getCity().equals("current")){
-                cityExsist = true;
-                break;
+                weatherModels.set(0, weatherModel);
+            }else{
+                weatherModels.add(0, weatherModel);
             }
-        }
 
-        if(cityExsist == true){
-            weatherModels.set(0, weatherModel);
         }else{
             weatherModels.add(0, weatherModel);
         }
