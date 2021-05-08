@@ -12,9 +12,9 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
 
     private final ArrayList<Fragment> mWeatherFragments;
 
-    public ViewPagerFragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, ArrayList<Fragment> mWeatherFragments) {
+    public ViewPagerFragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, ArrayList<Fragment> weatherFragments) {
         super(fragmentManager, lifecycle);
-        this.mWeatherFragments = mWeatherFragments;
+        this.mWeatherFragments = weatherFragments;
     }
 
     @NonNull

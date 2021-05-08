@@ -43,16 +43,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private static final int REQUEST_CODE = 255;
 
     //Bundle
-    Bundle intentBundle = new Bundle();
+    private Bundle mIntentBundle;
 
     //Shared Preferences
-    private SharedPreferences pSharedPref;
+    private SharedPreferences mSharedPref;
 
     //presenter
     private MainActivityPresenter mMainActivityPresenter;
 
     //intent
-    private Intent intentCity;
+    private Intent mIntentCity;
 
     //ViewPager
     private ViewPager2 mViewPager2;
@@ -70,8 +70,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         //ViewPager
         mViewPager2 = findViewById(R.id.view_pager);
 
-        pSharedPref = this.getSharedPreferences(PREFS_NAME, MainActivity.MODE_PRIVATE);
-        intentCity = new Intent(this, CitiesActivity.class);
+        mIntentBundle = new Bundle();
+        mSharedPref = this.getSharedPreferences(PREFS_NAME, MainActivity.MODE_PRIVATE);
+
+        mIntentCity = new Intent(this, CitiesActivity.class);
 
         //Permission check
         permissionCheck();
@@ -169,9 +171,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
      */
     @Override
     public void cityIntent(ArrayList<WeatherModel> cityLocationArray){
-        intentBundle.putSerializable("httpModels", cityLocationArray);
-        intentCity.putExtras(intentBundle);
-        startActivityForResult(intentCity, REQUEST_CODE);
+        mIntentBundle.putSerializable("httpModels", cityLocationArray);
+        mIntentCity.putExtras(mIntentBundle);
+        startActivityForResult(mIntentCity, REQUEST_CODE);
     }
 
     @Override
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     public void getPreferences(){
         try{
             //get from shared prefs
-            String storedCityArrayString = pSharedPref.getString("weatherArray", (new JSONObject()).toString());
+            String storedCityArrayString = mSharedPref.getString("weatherArray", (new JSONObject()).toString());
             java.lang.reflect.Type cityType = new TypeToken<ArrayList<WeatherModel>>(){}.getType();
             Gson gson = new Gson();
 
@@ -229,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         Gson gson = new Gson();
         String hashMapString = gson.toJson(cityLocationArray);
         //save in shared prefs
-        pSharedPref.edit().putString("weatherArray", hashMapString).apply();
+        mSharedPref.edit().putString("weatherArray", hashMapString).apply();
     }
 
     /**

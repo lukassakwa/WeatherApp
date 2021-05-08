@@ -11,12 +11,14 @@ public interface CitiesActivityContract {
         void onExitActivity(ArrayList<WeatherModel> weatherModels);
         void initRecyclerView(CitiesRVPresenter citiesRVPresenter);
         void intentSearchActivity(ArrayList<WeatherModel> weatherModels);
+        void setPreferences(ArrayList<WeatherModel> weatherModels);
     }
 
     interface Presenter{
         void getInitRecyclerView();
         void exitCityActivity();
         void getIntentSearchActivity();
+        void saveArrayToPreferences();
     }
 
 }

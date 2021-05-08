@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class LocationWeatherFragment extends Fragment implements LocationWeatherFragmentContract.View {
 
     //Presenter
-    private LocationWeatherFragmentPresenter locationWeatherFragmentPresenter;
+    private LocationWeatherFragmentPresenter mLocationWeatherFragmentPresenter;
     //Model
     private WeatherModel weather;
 
@@ -87,9 +87,9 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
         weather = (WeatherModel) getArguments().getSerializable("httpModel");
 
         //presenter
-        locationWeatherFragmentPresenter = new LocationWeatherFragmentPresenter(weather);
-        locationWeatherFragmentPresenter.attach(this);
-        locationWeatherFragmentPresenter.getWeather();
+        mLocationWeatherFragmentPresenter = new LocationWeatherFragmentPresenter(weather);
+        mLocationWeatherFragmentPresenter.attach(this);
+        mLocationWeatherFragmentPresenter.getWeather();
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -166,8 +166,8 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
 
                     WeatherModel weatherModel = new WeatherModel(lon, lat, "current");
 
-                    locationWeatherFragmentPresenter.setWeatherModel(weatherModel);
-                    locationWeatherFragmentPresenter.getWeather();
+                    mLocationWeatherFragmentPresenter.setWeatherModel(weatherModel);
+                    mLocationWeatherFragmentPresenter.getWeather();
 
                     //update location weatherModel in main activity
                     Bundle result = new Bundle();

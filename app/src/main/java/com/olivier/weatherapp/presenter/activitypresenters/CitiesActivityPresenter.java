@@ -38,6 +38,12 @@ public class CitiesActivityPresenter extends BasePresenter<CitiesActivityContrac
         view.intentSearchActivity(weatherModels);
     }
 
+    @Override
+    public void saveArrayToPreferences() {
+        weatherModels = citiesRVPresenter.getWeatherModels();
+        view.setPreferences(weatherModels);
+    }
+
     //init adapters array and passing to recycler view objject
     private CitiesRVPresenter initCitiesRVPresenter(){
         ArrayList<CitiesRVAdapterPresenter> citiesRVAdapterPresenters = new ArrayList<>();

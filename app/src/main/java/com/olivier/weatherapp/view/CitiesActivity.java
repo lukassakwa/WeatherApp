@@ -1,6 +1,7 @@
 package com.olivier.weatherapp.view;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.gson.Gson;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.activitypresenters.CitiesActivityPresenter;
@@ -21,15 +23,19 @@ import java.util.ArrayList;
 
 public class CitiesActivity extends AppCompatActivity implements CitiesActivityContract.View {
 
+    private static final String PREFS_NAME = "PrefMain";
+
     //Presenter for City recycler view
-    private CitiesActivityPresenter citiesActivityPresenter;
+    private CitiesActivityPresenter mCitiesActivityPresenter;
 
-    private Intent intent;
-    private Bundle bundle;
+    private SharedPreferences mSharedPreferences;
 
-    private RecyclerView citiesRecyclerView;
-    private RecyclerView.Adapter citiesAdapter;
-    private RecyclerView.LayoutManager citiesLayoutManager;
+    private Intent mIntent;
+    private Bundle mBundle;
+
+    private RecyclerView mCitiesRecyclerView;
+    private RecyclerView.Adapter mCitiesAdapter;
+    private RecyclerView.LayoutManager mCitiesLayoutManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,17 +45,18 @@ public class CitiesActivity extends AppCompatActivity implements CitiesActivityC
         //Setting toolbar elements
         initToolbar();
 
-        bundle = new Bundle();
-        intent = new Intent();
+        mSharedPreferences = this.getSharedPreferences(PREFS_NAME, CitiesActivity.MODE_PRIVATE);
+        mBundle = new Bundle();
+        mIntent = new Intent();
 
         //get weather list from main activity
         Intent mainIntent = getIntent();
         ArrayList<WeatherModel> cityLocationArray = (ArrayList<WeatherModel>) mainIntent.getSerializableExtra("httpModels");
 
         //Init presenter
-        citiesActivityPresenter = new CitiesActivityPresenter(cityLocationArray);
-        citiesActivityPresenter.attach(this);
-        citiesActivityPresenter.getInitRecyclerView();
+        mCitiesActivityPresenter = new CitiesActivityPresenter(cityLocationArray);
+        mCitiesActivityPresenter.attach(this);
+        mCitiesActivityPresenter.getInitRecyclerView();
     }
 
     //Menu 3 kropki w prawym gornym rogu
@@ -70,10 +77,10 @@ public class CitiesActivity extends AppCompatActivity implements CitiesActivityC
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
             case android.R.id.home:
-                citiesActivityPresenter.exitCityActivity();
+                mCitiesActivityPresenter.exitCityActivity();
                 return true;
             case R.id.add_item:
-                citiesActivityPresenter.getIntentSearchActivity();
+                mCitiesActivityPresenter.getIntentSearchActivity();
                 return true;
             default:
                 break;
@@ -83,29 +90,36 @@ public class CitiesActivity extends AppCompatActivity implements CitiesActivityC
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        mCitiesActivityPresenter.saveArrayToPreferences();
+    }
+
+    @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        citiesActivityPresenter.exitCityActivity();
+        mCitiesActivityPresenter.exitCityActivity();
     }
 
     //Exit from Intent
     @Override
     public void onExitActivity(ArrayList<WeatherModel> weatherModels) {
-        bundle.putSerializable("httpModels", weatherModels);
-        intent.putExtras(bundle);
-        setResult(RESULT_OK, intent);
+        mBundle.putSerializable("httpModels", weatherModels);
+        mIntent.putExtras(mBundle);
+        setResult(RESULT_OK, mIntent);
         finish();
     }
 
     @Override
     public void initRecyclerView(CitiesRVPresenter citiesRVPresenter) {
-        citiesRecyclerView = findViewById(R.id.citiesRecyclerView);
+        mCitiesRecyclerView = findViewById(R.id.citiesRecyclerView);
 
-        citiesLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        citiesRecyclerView.setLayoutManager(citiesLayoutManager);
+        mCitiesLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mCitiesRecyclerView.setLayoutManager(mCitiesLayoutManager);
 
-        citiesAdapter = new CitiesAdapter(citiesRVPresenter);
-        citiesRecyclerView.setAdapter(citiesAdapter);
+        mCitiesAdapter = new CitiesAdapter(citiesRVPresenter);
+        mCitiesRecyclerView.setAdapter(mCitiesAdapter);
     }
 
     @Override
@@ -115,6 +129,13 @@ public class CitiesActivity extends AppCompatActivity implements CitiesActivityC
         bundle.putSerializable("httpModels", weatherModels);
         searchIntent.putExtras(bundle);
         startActivity(searchIntent);
+    }
+
+    @Override
+    public void setPreferences(ArrayList<WeatherModel> weatherModels) {
+        Gson gson = new Gson();
+        String weatherArray = gson.toJson(weatherModels);
+        mSharedPreferences.edit().putString("weatherArray", weatherArray).apply();
     }
 
     private void initToolbar(){

@@ -14,10 +14,10 @@ import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresente
 
 public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder> implements CityRecyclerViewContract.View{
 
-    private CitiesRVPresenter citiesRVPresenter;
+    private CitiesRVPresenter mCitiesRVPresenter;
 
     public CitiesAdapter(CitiesRVPresenter citiesRVPresenter) {
-        this.citiesRVPresenter = citiesRVPresenter;
+        this.mCitiesRVPresenter = citiesRVPresenter;
         citiesRVPresenter.attach(this);
     }
 
@@ -67,16 +67,16 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //Presenter for this Recycler View
-        citiesRVPresenter.getLocationWeaher(holder, position);
+        mCitiesRVPresenter.getLocationWeaher(holder, position);
 
         holder.delete.setOnClickListener((v) -> {
-            citiesRVPresenter.updateView(holder.getAdapterPosition());
+            mCitiesRVPresenter.updateView(holder.getAdapterPosition());
         });
     }
 
     @Override
     public int getItemCount() {
-        return citiesRVPresenter.getSize();
+        return mCitiesRVPresenter.getSize();
     }
 
     @Override

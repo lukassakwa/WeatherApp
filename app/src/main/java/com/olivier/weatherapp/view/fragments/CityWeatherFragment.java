@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 public class CityWeatherFragment extends Fragment implements CityWeatherFragmentContract.View {
     //Presenter
-    private CityWeatherFragmentPresenter cityWeatherFragmentPresenter;
+    private CityWeatherFragmentPresenter mCityWeatherFragmentPresenter;
 
     //Context
     private final FragmentActivity contextWeather;
@@ -38,13 +38,13 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
 
     //Recycler View hours
     private RecyclerView weatherHourRecyclerView;
-    private RecyclerView.Adapter weatherHourRecyclerViewAdapter;
-    private RecyclerView.LayoutManager weatherHourRecyclerViewLayoutManager;
+    private RecyclerView.Adapter mWeatherHourRecyclerViewAdapter;
+    private RecyclerView.LayoutManager mWeatherHourRecyclerViewLayoutManager;
 
     //Recycler View daily
     private RecyclerView weatherDayRaportRecyclerView;
-    private RecyclerView.Adapter weatherDayRaportAdapter;
-    private RecyclerView.LayoutManager weatherDayRaportLayoutManager;
+    private RecyclerView.Adapter mWeatherDayRaportAdapter;
+    private RecyclerView.LayoutManager mWeatherDayRaportLayoutManager;
 
     //Widgets
     private TextView mainTemperatureTextView;
@@ -65,16 +65,16 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        weatherHourRecyclerViewLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.HORIZONTAL, false);
-        weatherDayRaportLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.VERTICAL, false);
+        mWeatherHourRecyclerViewLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.HORIZONTAL, false);
+        mWeatherDayRaportLayoutManager = new LinearLayoutManager(contextWeather, LinearLayoutManager.VERTICAL, false);
 
         //Weather model data from bundle;
         WeatherModel weather = (WeatherModel) getArguments().getSerializable("httpModel");
 
         //presenter
-        cityWeatherFragmentPresenter = new CityWeatherFragmentPresenter(weather);
-        cityWeatherFragmentPresenter.attach(this);
-        cityWeatherFragmentPresenter.getWeather();
+        mCityWeatherFragmentPresenter = new CityWeatherFragmentPresenter(weather);
+        mCityWeatherFragmentPresenter.attach(this);
+        mCityWeatherFragmentPresenter.getWeather();
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -128,7 +128,7 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                cityWeatherFragmentPresenter.getWeatherUpdate();
+                mCityWeatherFragmentPresenter.getWeatherUpdate();
             }
         });
     }
@@ -163,19 +163,19 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
 
     private void DayRecyclerView(ArrayList<DailyWeather> dailyDataModels){
         weatherDayRaportRecyclerView.setHasFixedSize(true);
-        weatherDayRaportRecyclerView.setLayoutManager(weatherDayRaportLayoutManager);
+        weatherDayRaportRecyclerView.setLayoutManager(mWeatherDayRaportLayoutManager);
 
-        weatherDayRaportAdapter = new WeatherDayRaportAdapter(dailyDataModels);
-        weatherDayRaportRecyclerView.setAdapter(weatherDayRaportAdapter);
+        mWeatherDayRaportAdapter = new WeatherDayRaportAdapter(dailyDataModels);
+        weatherDayRaportRecyclerView.setAdapter(mWeatherDayRaportAdapter);
     }
 
     private void HourRecyclerView(ArrayList<HourlyWeather> forecastDataModels){
         //Do clasy fragmentowej Recycler View
         weatherHourRecyclerView.setHasFixedSize(true);
-        weatherHourRecyclerView.setLayoutManager(weatherHourRecyclerViewLayoutManager);
+        weatherHourRecyclerView.setLayoutManager(mWeatherHourRecyclerViewLayoutManager);
 
-        weatherHourRecyclerViewAdapter = new WeatherHourAdapter(forecastDataModels);
-        weatherHourRecyclerView.setAdapter(weatherHourRecyclerViewAdapter);
+        mWeatherHourRecyclerViewAdapter = new WeatherHourAdapter(forecastDataModels);
+        weatherHourRecyclerView.setAdapter(mWeatherHourRecyclerViewAdapter);
     }
 
     //from Contract.View interface

@@ -34,7 +34,7 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
     private LocationRequest mLocationRequest;
 
     //Shared Preferences
-    private SharedPreferences pSharedPref;
+    private SharedPreferences mSharedPref;
 
     private Button currentButton;
     private Button krakowButton;
@@ -57,7 +57,7 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         mMainAcivityIntent = new Intent(this, MainActivity.class);
 
         //preference init to save weather array list and go back to activity
-        pSharedPref = this.getSharedPreferences(PREFS_NAME, MainActivity.MODE_PRIVATE);
+        mSharedPref = this.getSharedPreferences(PREFS_NAME, MainActivity.MODE_PRIVATE);
 
         //location init
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -158,7 +158,7 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         Gson gson = new Gson();
         String weatherArrayList = gson.toJson(weatherModels);
         //save in shared prefs
-        pSharedPref.edit().putString("weatherArray", weatherArrayList).apply();
+        mSharedPref.edit().putString("weatherArray", weatherArrayList).apply();
 
     }
 
