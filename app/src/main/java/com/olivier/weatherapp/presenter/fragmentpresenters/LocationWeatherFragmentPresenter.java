@@ -129,18 +129,18 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<ContractMVP.
     }
 
     //Initializing hour Weather model for day
-    private ArrayList<DailyWeather> dailyWeatherInit(List<ListItem> dailyItem){
+    private ArrayList<DailyWeather> dailyWeatherInit(List<ListItem> dailyItems){
         ArrayList<DailyWeather> futureWeathers = new ArrayList<>();
 
         //DailyInit
-        for(int i = 0; i < dailyItem.size()-1; i++){
+        for(ListItem dailyItem : dailyItems){
             //Reading from Json Pojo
             DailyWeather futureWeather = new DailyWeather();
-            futureWeather.setMinTemp(dailyItem.get(i).getTemp().getMin());
-            futureWeather.setMaxTemp(dailyItem.get(i).getTemp().getMax());
-            futureWeather.setDescription(dailyItem.get(i).getWeather().get(0).getDescription());
-            futureWeather.setIcon(dailyItem.get(i).getWeather().get(0).getIcon());
-            futureWeather.setDt(dailyItem.get(i).getDt());
+            futureWeather.setMinTemp(dailyItem.getTemp().getMin());
+            futureWeather.setMaxTemp(dailyItem.getTemp().getMax());
+            futureWeather.setDescription(dailyItem.getWeather().get(0).getDescription());
+            futureWeather.setIcon(dailyItem.getWeather().get(0).getIcon());
+            futureWeather.setDt(dailyItem.getDt());
             futureWeathers.add(futureWeather);
         }
 
