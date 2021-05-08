@@ -1,11 +1,13 @@
 # WeatherApp
 Android Weather App
 
-https://user-images.githubusercontent.com/75526352/116673962-51616480-a9a4-11eb-91c4-7b218752098a.mp4
+https://user-images.githubusercontent.com/75526352/117536776-573af380-affd-11eb-95b1-ed8e87e7f12b.mp4
 
 Custom your layout
 
-https://user-images.githubusercontent.com/75526352/116675082-bb2e3e00-a9a5-11eb-9f76-de7061dce658.mp4
+https://user-images.githubusercontent.com/75526352/117536783-60c45b80-affd-11eb-9d6c-b06b0137a2b9.mp4
+
+https://user-images.githubusercontent.com/75526352/117536791-7043a480-affd-11eb-85ad-5625a7308bdc.mp4
 
 Requirements
 
