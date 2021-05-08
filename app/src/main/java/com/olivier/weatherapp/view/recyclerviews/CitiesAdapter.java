@@ -8,10 +8,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.olivier.weatherapp.R;
-import com.olivier.weatherapp.presenter.contract.Contract;
+import com.olivier.weatherapp.presenter.contract.CityRecyclerViewAdapterContract;
+import com.olivier.weatherapp.presenter.contract.CityRecyclerViewContract;
 import com.olivier.weatherapp.presenter.recyclerviewspresenters.CitiesRVPresenter;
 
-public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder> implements Contract.CityRVView{
+public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder> implements CityRecyclerViewContract.View{
 
     private CitiesRVPresenter citiesRVPresenter;
 
@@ -20,7 +21,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder
         citiesRVPresenter.attach(this);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements Contract.CityRVAdapterView {
+    public class ViewHolder extends RecyclerView.ViewHolder implements CityRecyclerViewAdapterContract.View {
 
         private ImageButton delete;
 

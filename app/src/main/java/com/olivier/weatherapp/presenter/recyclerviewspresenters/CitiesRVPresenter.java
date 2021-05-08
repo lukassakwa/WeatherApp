@@ -2,13 +2,13 @@ package com.olivier.weatherapp.presenter.recyclerviewspresenters;
 
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
-import com.olivier.weatherapp.presenter.contract.Contract;
+import com.olivier.weatherapp.presenter.contract.CityRecyclerViewContract;
 import com.olivier.weatherapp.presenter.recyclerviewspresenters.adapters.CitiesRVAdapterPresenter;
 import com.olivier.weatherapp.view.recyclerviews.CitiesAdapter;
 
 import java.util.ArrayList;
 
-public class CitiesRVPresenter extends BasePresenter<Contract.CityRVView> implements Contract.CityRVPresenter {
+public class CitiesRVPresenter extends BasePresenter<CityRecyclerViewContract.View> implements CityRecyclerViewContract.Presenter {
 
     //Recycler View Adapter Presenter which is in city view presenter
     private final ArrayList<CitiesRVAdapterPresenter> citiesRVAdapterPresenters;

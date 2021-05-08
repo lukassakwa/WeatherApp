@@ -23,14 +23,14 @@ import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.DailyWeather;
 import com.olivier.weatherapp.model.HourlyWeather;
 import com.olivier.weatherapp.model.WeatherModel;
-import com.olivier.weatherapp.presenter.contract.Contract;
+import com.olivier.weatherapp.presenter.contract.LocationWeatherFragmentContract;
 import com.olivier.weatherapp.presenter.fragmentpresenters.LocationWeatherFragmentPresenter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherDayRaportAdapter;
 import com.olivier.weatherapp.view.recyclerviews.WeatherHourAdapter;
 
 import java.util.ArrayList;
 
-public class LocationWeatherFragment extends Fragment implements Contract.LocationWeatherFragmentView {
+public class LocationWeatherFragment extends Fragment implements LocationWeatherFragmentContract.View {
 
     //Presenter
     private LocationWeatherFragmentPresenter locationWeatherFragmentPresenter;
