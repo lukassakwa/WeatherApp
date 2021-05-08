@@ -16,20 +16,29 @@ public class MainActivityPresenter extends BasePresenter<MainActivityContract.Vi
 
     //TODO:: operation on list from main activity
 
+    @Override
     public void getViewPager(){
         view.SetViewPager(cityLocationArray);
     }
 
+    @Override
     public void saveArrayToPreferences(){
         view.setPreferences(cityLocationArray);
     }
 
+    @Override
     public void getArrayFromPreferences(){
         view.getPreferences();
     }
 
+    @Override
     public void getIntentCity(){
         view.cityIntent(cityLocationArray);
+    }
+
+    @Override
+    public void setLocationWeather(WeatherModel locationWeather) {
+        cityLocationArray.set(0, locationWeather);
     }
 
     public ArrayList<WeatherModel> getCityLocationArray() {
@@ -40,7 +49,4 @@ public class MainActivityPresenter extends BasePresenter<MainActivityContract.Vi
         this.cityLocationArray = cityLocationArray;
     }
 
-    public void setLocationWeather(WeatherModel locationWeather) {
-        cityLocationArray.set(0, locationWeather);
-    }
 }

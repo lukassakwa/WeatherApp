@@ -14,7 +14,11 @@ public interface MainActivityContract {
     }
 
     interface Presenter{
-
+        void getViewPager();
+        void saveArrayToPreferences();
+        void getArrayFromPreferences();
+        void getIntentCity();
+        void setLocationWeather(WeatherModel locationWeather);
     }
 
 }

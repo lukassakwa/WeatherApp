@@ -14,7 +14,9 @@ public interface CitiesActivityContract {
     }
 
     interface Presenter{
-
+        void getInitRecyclerView();
+        void exitCityActivity();
+        void getIntentSearchActivity();
     }
 
 }
