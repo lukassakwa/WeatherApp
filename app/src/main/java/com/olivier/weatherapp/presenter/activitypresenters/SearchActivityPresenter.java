@@ -50,10 +50,9 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
         findCityCall.enqueue(new Callback<FindCity>() {
             @Override
             public void onResponse(Call<FindCity> call, Response<FindCity> response) {
-                //TODO:: get list of city and throw this list to user
-
                 FindCity findCityWeather = response.body();
 
+                //TODO:: get list of city and throw this list to user
                 Double lat = findCityWeather.getList().get(0).getCoord().getLat();
                 Double lon = findCityWeather.getList().get(0).getCoord().getLon();
 

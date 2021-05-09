@@ -101,14 +101,14 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         });
 
         krakowButton.setOnClickListener((v) -> {
-            WeatherModel weatherModel = new WeatherModel(19.9167, 50.0833, "Krakow");
+            WeatherModel weatherModel = new WeatherModel(19.9167, 50.0833);
 
             mSearchActivityPresenter.addWeather(weatherModel);
             mSearchActivityPresenter.exit();
         });
 
         warsawButton.setOnClickListener((v) -> {
-            WeatherModel weatherModel = new WeatherModel(21.012229, 52.229676, "Warsaw");
+            WeatherModel weatherModel = new WeatherModel(21.0118, 52.2298);
 
             mSearchActivityPresenter.addWeather(weatherModel);
             mSearchActivityPresenter.exit();
