@@ -161,6 +161,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mMainActivityPresenter.getViewPager();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         mMainActivityPresenter.saveArrayToPreferences();

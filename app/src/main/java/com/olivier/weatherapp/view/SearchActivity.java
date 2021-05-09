@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -36,14 +37,13 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
     //Shared Preferences
     private SharedPreferences mSharedPref;
 
+    private SearchView searchView;
+
     private Button currentButton;
     private Button krakowButton;
     private Button warsawButton;
 
     private Intent mMainAcivityIntent;
-
-    public SearchActivity() {
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,12 +68,33 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         mSearchActivityPresenter = new SearchActivityPresenter(weatherModels);
         mSearchActivityPresenter.attach(this);
 
+        searchView = findViewById(R.id.searchView);
 
         currentButton = findViewById(R.id.currentButton);
         krakowButton = findViewById(R.id.krakowButton);
         warsawButton = findViewById(R.id.warsawButton);
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:: return list of searched city
+                mSearchActivityPresenter.findCity(query);
+                return true;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+
+                return false;
+            }
+        });
 
         currentButton.setOnClickListener((v) -> {
             getLocation();

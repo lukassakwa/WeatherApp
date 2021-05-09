@@ -1,5 +1,6 @@
 package com.olivier.weatherapp.presenter.activitypresenters;
 
+import android.util.Log;
 import com.olivier.weatherapp.api.ClientApi;
 import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.WeatherModel;
@@ -35,6 +36,38 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
         }else{
             weatherModels.add(0, weatherModel);
         }
+    }
+
+    @Override
+    public void findCity(String city) {
+        WeatherModel weatherModel = new WeatherModel(city);
+
+        WeatherRestRepository findCity = ClientApi.getRetrofit(weatherModel).create(WeatherRestRepository.class);
+        Call<FindCity> findCityCall = findCity.getFindCity(weatherModel.getCity(),
+                weatherModel.getUnits(),
+                weatherModel.getAuthorization());
+
+        findCityCall.enqueue(new Callback<FindCity>() {
+            @Override
+            public void onResponse(Call<FindCity> call, Response<FindCity> response) {
+                //TODO:: get list of city and throw this list to user
+
+                FindCity findCityWeather = response.body();
+
+                Double lat = findCityWeather.getList().get(0).getCoord().getLat();
+                Double lon = findCityWeather.getList().get(0).getCoord().getLon();
+
+                WeatherModel cityWeatherModel = new WeatherModel(lon, lat);
+
+                addWeather(cityWeatherModel);
+                exit();
+            }
+
+            @Override
+            public void onFailure(Call<FindCity> call, Throwable t) {
+                Log.d("GSON_EXCEPTION", t.toString());
+            }
+        });
     }
 
     @Override

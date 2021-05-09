@@ -59,6 +59,7 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
 
     public CityWeatherFragment(Context context){
         this.contextWeather = (FragmentActivity) context;
+
     }
 
     @Override
@@ -132,8 +133,6 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
             }
         });
     }
-
-
 
     private void InitWidgets(View view) {
         mainTemperatureTextView = view.findViewById(R.id.mainTemperatureTextView);

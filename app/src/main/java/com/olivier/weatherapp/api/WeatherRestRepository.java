@@ -2,6 +2,7 @@ package com.olivier.weatherapp.api;
 
 import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
 import com.olivier.weatherapp.model.weathermodels.daily.DailyWeatherModel;
+import com.olivier.weatherapp.model.weathermodels.find.FindCity;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyWeatherModel;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -26,5 +27,10 @@ public interface WeatherRestRepository {
                                             @Query("lon") Double lon,
                                             @Query("units") String units,
                                             @Query("appid") String authorization);
+
+    @GET("find")
+    Call<FindCity> getFindCity(@Query("q") String city,
+                               @Query("units") String units,
+                               @Query("appid") String authorization);
 
 }

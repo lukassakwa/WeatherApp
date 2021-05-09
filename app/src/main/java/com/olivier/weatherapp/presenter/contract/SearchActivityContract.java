@@ -9,10 +9,12 @@ public interface SearchActivityContract {
     interface View{
         void exitActivity();
         void setPreferences(ArrayList<WeatherModel> weatherModels);
+        void listOfCities();
     }
 
     interface Presenter{
-        void addWeather(WeatherModel weatherModel, String cityName);
+        void findCity(String city);
+        void addWeather(WeatherModel weatherModel);
         void addLocationWeather(WeatherModel weatherModel);
         void saveArrayToPreferences();
         void exit();

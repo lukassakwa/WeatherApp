@@ -40,8 +40,9 @@
                 android:name=".view.SearchActivity"
                 android:theme="@style/AppTheme.NoActionBar">
                 <intent-filter>
-                    <category android:name="android.intent.category.DEFAULT"/>
+                    <action android:name="android.intent.action.SEARCH" />
                 </intent-filter>
+
         </activity>
     </application>
 
