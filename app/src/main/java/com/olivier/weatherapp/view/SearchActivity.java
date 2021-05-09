@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -68,9 +69,13 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         mSearchActivityPresenter = new SearchActivityPresenter(weatherModels);
         mSearchActivityPresenter.attach(this);
 
+        searchView = findViewById(R.id.searchView);
+
         currentButton = findViewById(R.id.currentButton);
         krakowButton = findViewById(R.id.krakowButton);
         warsawButton = findViewById(R.id.warsawButton);
+
+
 
         currentButton.setOnClickListener((v) -> {
             getLocation();
@@ -79,14 +84,14 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         krakowButton.setOnClickListener((v) -> {
             WeatherModel weatherModel = new WeatherModel(19.9167, 50.0833, "Krakow");
 
-            mSearchActivityPresenter.addWeather(weatherModel, "Krakow");
+            mSearchActivityPresenter.addWeather(weatherModel);
             mSearchActivityPresenter.exit();
         });
 
         warsawButton.setOnClickListener((v) -> {
             WeatherModel weatherModel = new WeatherModel(21.012229, 52.229676, "Warsaw");
 
-            mSearchActivityPresenter.addWeather(weatherModel, "Warsaw");
+            mSearchActivityPresenter.addWeather(weatherModel);
             mSearchActivityPresenter.exit();
         });
 
@@ -159,6 +164,11 @@ public class SearchActivity extends AppCompatActivity implements SearchActivityC
         String weatherArrayList = gson.toJson(weatherModels);
         //save in shared prefs
         mSharedPref.edit().putString("weatherArray", weatherArrayList).apply();
+
+    }
+
+    @Override
+    public void listOfCities() {
 
     }
 
