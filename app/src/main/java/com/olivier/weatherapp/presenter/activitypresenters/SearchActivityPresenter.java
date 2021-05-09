@@ -1,8 +1,14 @@
 package com.olivier.weatherapp.presenter.activitypresenters;
 
+import com.olivier.weatherapp.api.ClientApi;
+import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.WeatherModel;
+import com.olivier.weatherapp.model.weathermodels.find.FindCity;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.SearchActivityContract;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 
@@ -32,16 +38,19 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
     }
 
     @Override
-    public void addWeather(WeatherModel weatherModel, String name) {
+    public void addWeather(WeatherModel weatherModel) {
+        final double THRESHOLD = .0001;
         boolean cityExsist = false;
 
+        //check if element exist in list
         for(WeatherModel cityWeather : weatherModels){
-            if(cityWeather.getCity().equals(name)){
+            if(Math.abs(cityWeather.getLat() - weatherModel.getLat()) < THRESHOLD && Math.abs(cityWeather.getLon() - weatherModel.getLon()) < THRESHOLD){
                 cityExsist = true;
                 break;
             }
         }
 
+        //if element doesnt exist add him to list
         if(cityExsist == false){
             weatherModels.add(weatherModel);
         }
