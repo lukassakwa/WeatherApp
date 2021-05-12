@@ -20,6 +20,7 @@ Tested on Pixel 2
 Built With
 
     Retrofit 2 - A type-safe HTTP client for Android and Java
+    OkHttp - Factory for calls, which can be used to send HTTP requests and read their responses
     OpenWeatherMap - Weather API
     Gson - A Java serialization/deserialization library 
     Picasso - A powerful image downloading and caching library for Android
