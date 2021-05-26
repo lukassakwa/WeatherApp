@@ -29,19 +29,17 @@
                             android:layout_height="wrap_content"
                             android:id="@+id/mainTemperatureTextView"
                             android:textSize="74sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            android:layout_marginStart="16dp"
-                    />
+                            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginTop="16dp"/>
                     <TextView
                             android:text="-"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/weatherDescriptionTextView"
-                            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                            android:layout_marginEnd="16dp" android:layout_marginBottom="24dp"
-                            app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView"
-                            app:layout_constraintHorizontal_bias="1.0" android:textSize="30sp"/>
+                            android:textSize="30sp" app:layout_constraintTop_toBottomOf="@+id/cityTextView"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="10dp"/>
                     <TextView
                             android:text="\u2103"
                             android:layout_width="wrap_content"
@@ -49,6 +47,13 @@
                             app:layout_constraintStart_toEndOf="@+id/mainTemperatureTextView" android:textSize="24sp"
                             app:layout_constraintTop_toTopOf="@+id/mainTemperatureTextView"
                             android:layout_marginTop="18dp"/>
+                    <TextView
+                            android:text="-"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/cityTextView"
+                            android:textSize="18sp"
+                            app:layout_constraintTop_toBottomOf="@+id/mainTemperatureTextView"
+                            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"/>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -64,7 +69,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            android:layout_marginTop="36dp">
+                            android:layout_marginTop="16dp">
                     </androidx.recyclerview.widget.RecyclerView>
 
                     <TextView
@@ -88,15 +93,6 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             android:layout_marginTop="10dp"/>
-
-                    <TextView
-                            android:text="-"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:id="@+id/cityTextView"
-                            android:textSize="18sp"
-                            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
-                            app:layout_constraintBottom_toTopOf="@+id/weatherHourRecyclerView"
-                            android:layout_marginBottom="10dp"/>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
