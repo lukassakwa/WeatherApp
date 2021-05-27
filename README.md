@@ -9,7 +9,7 @@ Add your current location city
 
 ![currentCity](https://user-images.githubusercontent.com/75526352/119632824-74e7c580-be11-11eb-9769-0a25aeff16c9.gif)
 
-Choose city
+Select a city
 
 ![chooseCity](https://user-images.githubusercontent.com/75526352/119632838-77e2b600-be11-11eb-9599-0b8116e22351.gif)
 
