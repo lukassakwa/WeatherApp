@@ -1,6 +1,15 @@
 package com.olivier.weatherapp.presenter.fragmentpresenters;
 
+import android.annotation.SuppressLint;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.olivier.weatherapp.api.ClientApi;
 import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.CurrentWeather;
@@ -23,6 +32,10 @@ import java.util.List;
 
 public class LocationWeatherFragmentPresenter extends BasePresenter<LocationWeatherFragmentContract.View> implements LocationWeatherFragmentContract.Presenter {
 
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private LocationRequest mLocationResult;
+    private LocationCallback locationCallback;
+
     private WeatherModel _weatherModel;
 
     private CurrentWeather _currentWeather;
@@ -33,6 +46,57 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<LocationWeat
         this._weatherModel = weatherModel;
     }
 
+    public LocationWeatherFragmentPresenter(WeatherModel weatherModel, FusedLocationProviderClient fusedLocationProviderClient) {
+        this._weatherModel = weatherModel;
+        this.mFusedLocationProviderClient = fusedLocationProviderClient;
+        initLocationCallback();
+    }
+
+    private void initLocationCallback(){
+        //Callback function which updating weather in fragment
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                if(locationResult == null)
+                    return;
+
+                for(Location location : locationResult.getLocations()){
+
+                    double lon = location.getLongitude();
+                    double lat = location.getLatitude();
+
+                    _weatherModel = new WeatherModel(lon, lat, "current");
+                    getWeather();
+
+                    //update location weatherModel in main activity
+                    Bundle result = new Bundle();
+                    result.putSerializable("weatherObject", _weatherModel);
+                    view.resultDataToParent(result);
+                }
+                view.turnOffSwipeOnRefresh();
+                //remove location Callback when update is done
+                mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            }
+        };
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void updateWeather() {
+        setLocationRequest();
+        mFusedLocationProviderClient.requestLocationUpdates(mLocationResult, locationCallback, Looper.getMainLooper());
+    }
+
+    private void setLocationRequest(){
+        //Device location
+        mLocationResult = LocationRequest.create();
+        mLocationResult.setInterval(10000);
+        mLocationResult.setFastestInterval(5000);
+        mLocationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
     @Override
     public void getWeather() {
 
@@ -41,6 +105,7 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<LocationWeat
 
         Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
@@ -48,11 +113,13 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<LocationWeat
         Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
         Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 

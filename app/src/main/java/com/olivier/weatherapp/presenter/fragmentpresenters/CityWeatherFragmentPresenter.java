@@ -40,17 +40,20 @@ public class CityWeatherFragmentPresenter extends BasePresenter<CityWeatherFragm
 
         Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
         Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
         Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
@@ -115,17 +118,20 @@ public class CityWeatherFragmentPresenter extends BasePresenter<CityWeatherFragm
 
         Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
         Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
         Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
+                "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 

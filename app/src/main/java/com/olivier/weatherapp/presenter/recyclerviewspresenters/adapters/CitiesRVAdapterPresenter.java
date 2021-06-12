@@ -26,6 +26,7 @@ public class CitiesRVAdapterPresenter extends BasePresenter<CityRecyclerViewAdap
 
         Call<CurrentWeatherModel> oneCall = weatherRestRepository.getCurrentWeather(weatherModel.getLat(),
                 weatherModel.getLon(),
+                "en",
                 weatherModel.getUnits(),
                 weatherModel.getAuthorization());
 

@@ -44,6 +44,7 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
 
         WeatherRestRepository findCity = ClientApi.getRetrofit(weatherModel).create(WeatherRestRepository.class);
         Call<FindCity> findCityCall = findCity.getFindCity(weatherModel.getCity(),
+                "en",
                 weatherModel.getUnits(),
                 weatherModel.getAuthorization());
 

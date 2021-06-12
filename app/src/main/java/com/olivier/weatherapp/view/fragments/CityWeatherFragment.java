@@ -83,22 +83,14 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_weather_fragment, container, false);
-    }
-
-    // This event is triggered soon after onCreateView().
-    // onViewCreated() is only called if the view returned from onCreateView() is non-null.
-    // Any dsadas setup should occur here.  E.g., view lookups and attaching view listeners.
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.main_weather_fragment, container, false);
 
         //Init Main Activity Widgets
-        InitWidgets(view);
+        InitWidgets(rootView);
 
-        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-        weatherHourRecyclerView = view.findViewById(R.id.weatherHourRecyclerView);
-        weatherDayRaportRecyclerView = view.findViewById(R.id.weatherDayRaportRecyclerView);
+        swipeRefreshLayout = rootView.findViewById(R.id.swiperefresh);
+        weatherHourRecyclerView = rootView.findViewById(R.id.weatherHourRecyclerView);
+        weatherDayRaportRecyclerView = rootView.findViewById(R.id.weatherDayRaportRecyclerView);
 
         //This function allow as to swipe recycler view on right or left without swiping fragment
         weatherHourRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
@@ -132,6 +124,8 @@ public class CityWeatherFragment extends Fragment implements CityWeatherFragment
                 mCityWeatherFragmentPresenter.getWeatherUpdate();
             }
         });
+
+        return rootView;
     }
 
     private void InitWidgets(View view) {

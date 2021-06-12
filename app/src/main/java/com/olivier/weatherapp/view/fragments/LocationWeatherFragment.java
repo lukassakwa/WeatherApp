@@ -1,10 +1,7 @@
 package com.olivier.weatherapp.view.fragments;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,7 +14,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.google.android.gms.location.*;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.olivier.weatherapp.R;
 import com.olivier.weatherapp.model.CurrentWeather;
 import com.olivier.weatherapp.model.DailyWeather;
@@ -39,8 +37,6 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
 
     //Location
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private LocationRequest mLocationResult;
-    private LocationCallback locationCallback;
     
     //Context
     private final FragmentActivity contextWeather;
@@ -87,7 +83,7 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
         weather = (WeatherModel) getArguments().getSerializable("httpModel");
 
         //presenter
-        mLocationWeatherFragmentPresenter = new LocationWeatherFragmentPresenter(weather);
+        mLocationWeatherFragmentPresenter = new LocationWeatherFragmentPresenter(weather, mFusedLocationProviderClient);
         mLocationWeatherFragmentPresenter.attach(this);
         mLocationWeatherFragmentPresenter.getWeather();
     }
@@ -97,25 +93,16 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_weather_fragment, container, false);
-    }
-
-    // This event is triggered soon after onCreateView().
-    // onViewCreated() is only called if the view returned from onCreateView() is non-null.
-    // Any dsadas setup should occur here.  E.g., view lookups and attaching view listeners.
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.main_weather_fragment, container, false);
 
         //Init Main Activity Widgets
-        InitWidgets(view);
-
+        InitWidgets(rootView);
 
         //Refresh Swipe
-        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = rootView.findViewById(R.id.swiperefresh);
         //RecyclerView
-        weatherHourRecyclerView = view.findViewById(R.id.weatherHourRecyclerView);
-        weatherDayRaportRecyclerView = view.findViewById(R.id.weatherDayRaportRecyclerView);
+        weatherHourRecyclerView = rootView.findViewById(R.id.weatherHourRecyclerView);
+        weatherDayRaportRecyclerView = rootView.findViewById(R.id.weatherDayRaportRecyclerView);
 
         //This function allow as to swipe recycler view on right or left without swiping fragment
         weatherHourRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
@@ -146,40 +133,11 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                updateWeather();
+                mLocationWeatherFragmentPresenter.updateWeather();
             }
         });
 
-        //Callback function which updating weather in fragment
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-
-                if(locationResult == null)
-                    return;
-
-                for(Location location : locationResult.getLocations()){
-
-                    double lon = location.getLongitude();
-                    double lat = location.getLatitude();
-
-                    WeatherModel weatherModel = new WeatherModel(lon, lat, "current");
-
-                    mLocationWeatherFragmentPresenter.setWeatherModel(weatherModel);
-                    mLocationWeatherFragmentPresenter.getWeather();
-
-                    //update location weatherModel in main activity
-                    Bundle result = new Bundle();
-                    result.putSerializable("weatherObject", weatherModel);
-                    getParentFragmentManager().setFragmentResult("requestWeatherObject", result);
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-                //remove location Callback when update is done
-                mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            }
-        };
+        return rootView;
     }
 
     private void InitWidgets(View view) {
@@ -245,18 +203,13 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
         mainWindowSetWidget(currentWeather);
     }
 
-    //update user location
-    @SuppressLint("MissingPermission")
-    public void updateWeather() {
-        setLocationRequest();
-        mFusedLocationProviderClient.requestLocationUpdates(mLocationResult, locationCallback, Looper.getMainLooper());
+    @Override
+    public void resultDataToParent(Bundle result) {
+        getParentFragmentManager().setFragmentResult("requestWeatherObject", result);
     }
 
-    private void setLocationRequest(){
-        //Device location
-        mLocationResult = LocationRequest.create();
-        mLocationResult.setInterval(10000);
-        mLocationResult.setFastestInterval(5000);
-        mLocationResult.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    @Override
+    public void turnOffSwipeOnRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
