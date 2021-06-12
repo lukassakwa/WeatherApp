@@ -20,11 +20,12 @@ public class ClientApi {
         }
 
         if(retrofit == null){
-            return new Retrofit.Builder()
+            retrofit = new Retrofit.Builder()
                     .baseUrl(weatherModel.getHttpUrl())
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
+            return retrofit;
         }
         return retrofit;
     }
