@@ -1,15 +1,14 @@
 package com.olivier.weatherapp.presenter.activitypresenters;
 
-import android.util.Log;
 import com.olivier.weatherapp.api.ClientApi;
 import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.model.weathermodels.find.FindCity;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.SearchActivityContract;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.util.ArrayList;
 
@@ -43,31 +42,25 @@ public class SearchActivityPresenter extends BasePresenter<SearchActivityContrac
         WeatherModel weatherModel = new WeatherModel(city);
 
         WeatherRestRepository findCity = ClientApi.getRetrofit(weatherModel).create(WeatherRestRepository.class);
-        Call<FindCity> findCityCall = findCity.getFindCity(weatherModel.getCity(),
+        Observable<FindCity> findCityCall = findCity.getFindCity(weatherModel.getCity(),
                 "en",
                 weatherModel.getUnits(),
                 weatherModel.getAuthorization());
 
-        findCityCall.enqueue(new Callback<FindCity>() {
-            @Override
-            public void onResponse(Call<FindCity> call, Response<FindCity> response) {
-                FindCity findCityWeather = response.body();
+        findCityCall.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::findCitySucessHandler);
+    }
 
-                //TODO:: get list of city and throw this list to user
-                Double lat = findCityWeather.getList().get(0).getCoord().getLat();
-                Double lon = findCityWeather.getList().get(0).getCoord().getLon();
+    private void findCitySucessHandler(FindCity findCityWeather){
+        //TODO:: get list of city and throw this list to user
+        Double lat = findCityWeather.getList().get(0).getCoord().getLat();
+        Double lon = findCityWeather.getList().get(0).getCoord().getLon();
 
-                WeatherModel cityWeatherModel = new WeatherModel(lon, lat);
+        WeatherModel cityWeatherModel = new WeatherModel(lon, lat);
 
-                addWeather(cityWeatherModel);
-                exit();
-            }
-
-            @Override
-            public void onFailure(Call<FindCity> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
+        addWeather(cityWeatherModel);
+        exit();
     }
 
     @Override

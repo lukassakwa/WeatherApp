@@ -1,15 +1,14 @@
 package com.olivier.weatherapp.presenter.recyclerviewspresenters.adapters;
 
-import android.util.Log;
 import com.olivier.weatherapp.api.ClientApi;
 import com.olivier.weatherapp.api.WeatherRestRepository;
 import com.olivier.weatherapp.model.WeatherModel;
 import com.olivier.weatherapp.model.weathermodels.current.CurrentWeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.CityRecyclerViewAdapterContract;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class CitiesRVAdapterPresenter extends BasePresenter<CityRecyclerViewAdapterContract.View> implements CityRecyclerViewAdapterContract.Presenter{
 
@@ -24,29 +23,21 @@ public class CitiesRVAdapterPresenter extends BasePresenter<CityRecyclerViewAdap
     public void getCurrentWeather(){
         WeatherRestRepository weatherRestRepository = ClientApi.getRetrofit(weatherModel).create(WeatherRestRepository.class);
 
-        Call<CurrentWeatherModel> oneCall = weatherRestRepository.getCurrentWeather(weatherModel.getLat(),
+        Observable<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(weatherModel.getLat(),
                 weatherModel.getLon(),
                 "en",
                 weatherModel.getUnits(),
                 weatherModel.getAuthorization());
 
-        oneCall.enqueue(new Callback<CurrentWeatherModel>() {
+        currentWeatherModelCall.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::currentWeatherSuccesHandle);
+    }
 
-            @Override
-            public void onResponse(Call<CurrentWeatherModel> call, Response<CurrentWeatherModel> response) {
-                CurrentWeatherModel currentWeatherModel = response.body();
-
-                //set recycler view with data from rest api
-                view.showName(currentWeatherModel.getName());
-                view.showDescription(currentWeatherModel.getWeather().get(0).getDescription());
-                view.showTemp((int) currentWeatherModel.getMain().getTemp());
-            }
-
-            @Override
-            public void onFailure(Call<CurrentWeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
+    private void currentWeatherSuccesHandle(CurrentWeatherModel currentWeatherModel){
+        view.showName(currentWeatherModel.getName());
+        view.showDescription(currentWeatherModel.getWeather().get(0).getDescription());
+        view.showTemp((int) currentWeatherModel.getMain().getTemp());
     }
 
     //getActual Weather

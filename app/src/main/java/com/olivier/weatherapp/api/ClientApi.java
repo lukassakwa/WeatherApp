@@ -3,6 +3,7 @@ package com.olivier.weatherapp.api;
 import com.olivier.weatherapp.model.WeatherModel;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,7 @@ public class ClientApi {
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(weatherModel.getHttpUrl())
+                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();

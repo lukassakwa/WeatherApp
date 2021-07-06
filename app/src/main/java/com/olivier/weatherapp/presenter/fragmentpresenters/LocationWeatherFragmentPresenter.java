@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -23,9 +22,9 @@ import com.olivier.weatherapp.model.weathermodels.onecall.HourlyItem;
 import com.olivier.weatherapp.model.weathermodels.onecall.HourlyWeatherModel;
 import com.olivier.weatherapp.presenter.BasePresenter;
 import com.olivier.weatherapp.presenter.contract.LocationWeatherFragmentContract;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,82 +98,54 @@ public class LocationWeatherFragmentPresenter extends BasePresenter<LocationWeat
 
     @Override
     public void getWeather() {
-
         WeatherRestRepository weatherRestRepository = ClientApi.getRetrofit(_weatherModel).create(WeatherRestRepository.class);
 
-
-        Call<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
+        Observable<CurrentWeatherModel> currentWeatherModelCall = weatherRestRepository.getCurrentWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
-
-        Call<HourlyWeatherModel> oneCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
+        Observable<HourlyWeatherModel> hourlyWeatherModelCall = weatherRestRepository.getHourlyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 _weatherModel.getExcludes(),
                 "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
-        Call<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
+        Observable<DailyWeatherModel> dailyWeatherModelCall = weatherRestRepository.getDailyWeather(_weatherModel.getLat(),
                 _weatherModel.getLon(),
                 "en",
                 _weatherModel.getUnits(),
                 _weatherModel.getAuthorization());
 
-        currentWeatherModelCall.enqueue(new Callback<CurrentWeatherModel>() {
-            @Override
-            public void onResponse(Call<CurrentWeatherModel> call, Response<CurrentWeatherModel> response) {
-                CurrentWeatherModel currentWeatherModel = response.body();
-                _currentWeather = currentWeatherInit(currentWeatherModel);
+        currentWeatherModelCall.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::currentWeatherSuccesHandle);
 
-                view.showCurrentWeather(_currentWeather);
-            }
+        hourlyWeatherModelCall.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::hourlyWeatherSuccesHandle);
 
-            @Override
-            public void onFailure(Call<CurrentWeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
+        dailyWeatherModelCall.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::dailyWeatherSuccesHandle);
 
-        oneCall.enqueue(new Callback<HourlyWeatherModel>() {
+    }
 
-            @Override
-            public void onResponse(Call<HourlyWeatherModel> call, Response<HourlyWeatherModel> response) {
+    private void currentWeatherSuccesHandle(CurrentWeatherModel currentWeatherModel){
+        _currentWeather = currentWeatherInit(currentWeatherModel);
+        view.showCurrentWeather(_currentWeather);
+    }
 
-                if(response.isSuccessful()){
+    private void hourlyWeatherSuccesHandle(HourlyWeatherModel hourlyWeatherModel){
+        _hourlyWeather = hourlyWeatherInit(hourlyWeatherModel.getHourly());
+        view.showHourlyWeather(_hourlyWeather);
+    }
 
-                    HourlyWeatherModel hourlyWeatherModel = response.body();
-
-                    _hourlyWeather = hourlyWeatherInit(hourlyWeatherModel.getHourly());
-
-                    view.showHourlyWeather(_hourlyWeather);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<HourlyWeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-
-        });
-
-        dailyWeatherModelCall.enqueue(new Callback<DailyWeatherModel>() {
-            @Override
-            public void onResponse(Call<DailyWeatherModel> call, Response<DailyWeatherModel> response) {
-
-                DailyWeatherModel dailyWeatherModel = response.body();
-
-                _dailyWeather = dailyWeatherInit(dailyWeatherModel.getList());
-                view.showDailyWeather(_dailyWeather);
-            }
-
-            @Override
-            public void onFailure(Call<DailyWeatherModel> call, Throwable t) {
-                Log.d("GSON_EXCEPTION", t.toString());
-            }
-        });
+    private void dailyWeatherSuccesHandle(DailyWeatherModel dailyWeatherModel){
+        _dailyWeather = dailyWeatherInit(dailyWeatherModel.getList());
+        view.showDailyWeather(_dailyWeather);
     }
 
     //Initializing current and future model object

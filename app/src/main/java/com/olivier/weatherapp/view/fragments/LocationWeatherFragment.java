@@ -51,7 +51,7 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
 
     //Recycler View daily
     private RecyclerView weatherDayRaportRecyclerView;
-    private RecyclerView.Adapter weatherDayRaportAdapter;
+    private WeatherDayRaportAdapter weatherDayRaportAdapter;
     private RecyclerView.LayoutManager weatherDayRaportLayoutManager;
 
     //Widgets
@@ -85,6 +85,7 @@ public class LocationWeatherFragment extends Fragment implements LocationWeather
         //presenter
         mLocationWeatherFragmentPresenter = new LocationWeatherFragmentPresenter(weather, mFusedLocationProviderClient);
         mLocationWeatherFragmentPresenter.attach(this);
+        //Here is function giving data to view
         mLocationWeatherFragmentPresenter.getWeather();
     }
 

@@ -38,6 +38,9 @@ dependencies {
 
     implementation 'com.google.dagger:dagger:2.35.1'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.13'
+    implementation group: 'com.squareup.retrofit2', name: 'adapter-rxjava3', version: '2.9.0'
+    implementation group: 'io.reactivex.rxjava3', name: 'rxandroid', version: '3.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.android.volley:volley:1.2.0'
     implementation 'com.google.code.gson:gson:2.8.6'
